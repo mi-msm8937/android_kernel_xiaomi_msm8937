@@ -55,28 +55,36 @@ MODULE_LICENSE("GPLv2");
 #define DT2W_DEBUG		0
 #define DT2W_DEFAULT		0
 
-#define DT2W_PWRKEY_DUR		60
+#define DT2W_PWRKEY_DUR		30
 #define DT2W_FEATHER		200
 #define DT2W_TIME		700
 
+/* Half Screen */
+#define HALF_MAX_X		500
+#define HALF_MIN_X		250
+#define HALF_MAX_Y		750
+#define HALF_MIN_Y		500
+
 /* Resources */
 int dt2w_switch = DT2W_DEFAULT;
-bool dt2w_scr_suspended = false;
 static cputime64_t tap_time_pre = 0;
 static int touch_x = 0, touch_y = 0, touch_nr = 0, x_pre = 0, y_pre = 0;
 static bool touch_x_called = false, touch_y_called = false, touch_cnt = true;
 static bool exec_count = true;
-static struct input_dev * doubletap2wake_pwrdev;
+static struct input_dev *doubletap2wake_pwrdev;
 static DEFINE_MUTEX(pwrkeyworklock);
-static struct workqueue_struct *dt2w_input_wq;
 static struct work_struct dt2w_input_work;
+static struct work_struct doubletap2wake_presspwr_work;
 
 /* Read cmdline for dt2w */
 static int __init read_dt2w_cmdline(char *dt2w)
 {
 	if (strcmp(dt2w, "1") == 0) {
-		pr_info("[cmdline_dt2w]: DoubleTap2Wake enabled. | dt2w='%s'\n", dt2w);
+		pr_info("[cmdline_dt2w]: DoubleTap2Wake Half enabled. | dt2w='%s'\n", dt2w);
 		dt2w_switch = 1;
+	} else if (strcmp(dt2w, "2") == 0) {
+		pr_info("[cmdline_dt2w]: DoubleTap2Wake Full enabled. | dt2w='%s'\n", dt2w);
+		dt2w_switch = 2;
 	} else if (strcmp(dt2w, "0") == 0) {
 		pr_info("[cmdline_dt2w]: DoubleTap2Wake disabled. | dt2w='%s'\n", dt2w);
 		dt2w_switch = 0;
@@ -98,7 +106,7 @@ static void doubletap2wake_reset(void) {
 }
 
 /* PowerKey work func */
-static void doubletap2wake_presspwr(struct work_struct * doubletap2wake_presspwr_work) {
+static void doubletap2wake_presspwr(struct work_struct *work) {
 	if (!mutex_trylock(&pwrkeyworklock))
                 return;
 	input_event(doubletap2wake_pwrdev, EV_KEY, KEY_POWER, 1);
@@ -110,12 +118,10 @@ static void doubletap2wake_presspwr(struct work_struct * doubletap2wake_presspwr
         mutex_unlock(&pwrkeyworklock);
 	return;
 }
-static DECLARE_WORK(doubletap2wake_presspwr_work, doubletap2wake_presspwr);
 
 /* PowerKey trigger */
 static void doubletap2wake_pwrtrigger(void) {
 	schedule_work(&doubletap2wake_presspwr_work);
-        return;
 }
 
 /* unsigned */
@@ -143,7 +149,8 @@ static void detect_doubletap2wake(int x, int y, bool st)
         pr_info(LOGTAG"x,y(%4d,%4d) single:%s\n",
                 x, y, (single_touch) ? "true" : "false");
 #endif
-	if ((single_touch) && (dt2w_switch > 0) && (exec_count) && (touch_cnt)) {
+
+	if (single_touch && exec_count && touch_cnt) {
 		
 		if ((ktime_to_ms(ktime_get())-tap_time_pre) >= DT2W_TIME)
 			doubletap2wake_reset();
@@ -153,29 +160,33 @@ static void detect_doubletap2wake(int x, int y, bool st)
 		} else if (touch_nr == 1) {
 			if ((calc_feather(x, x_pre) < DT2W_FEATHER) &&
 			    (calc_feather(y, y_pre) < DT2W_FEATHER)) {
-				pr_info(LOGTAG"ON\n");
-				exec_count = false;
-				doubletap2wake_pwrtrigger();
-				doubletap2wake_reset();
+				if (dt2w_switch == 1) {
+					if ((x_pre >= HALF_MIN_X && x_pre <= HALF_MAX_X) &&
+					   (y_pre >= HALF_MIN_Y && y_pre <= HALF_MAX_Y)) {
+						pr_info(LOGTAG"ON\n");
+						exec_count = false;
+						doubletap2wake_pwrtrigger();
+						doubletap2wake_reset();
+					} else {
+						doubletap2wake_reset();
+						new_touch(x, y);
+					}
+				} else {
+					pr_info(LOGTAG"ON\n");
+					exec_count = false;
+					doubletap2wake_pwrtrigger();
+					doubletap2wake_reset();
+				}
 			} else {
 				doubletap2wake_reset();
 				new_touch(x, y);
 			}
 		}
-		/*if ((touch_nr > 1)) {
-			pr_info(LOGTAG"ON\n");
-			exec_count = false;
-			doubletap2wake_pwrtrigger();
-			doubletap2wake_reset();
-		}*/
 	}
 }
 
 static void dt2w_input_callback(struct work_struct *unused) {
-
 	detect_doubletap2wake(touch_x, touch_y, true);
-
-	return;
 }
 
 static void dt2w_input_event(struct input_handle *handle, unsigned int type,
@@ -187,7 +198,7 @@ static void dt2w_input_event(struct input_handle *handle, unsigned int type,
 		(code==ABS_MT_TRACKING_ID) ? "ID" :
 		"undef"), code, value);
 #endif
-	if (!dt2w_scr_suspended)
+	if (dt2w_scr_on() || !dt2w_switch)
 		return;
 
 	if (code == ABS_MT_SLOT) {
@@ -213,17 +224,17 @@ static void dt2w_input_event(struct input_handle *handle, unsigned int type,
 	if ((touch_x_called || touch_y_called) && touch_cnt)  {
 		touch_x_called = false;
 		touch_y_called = false;
-		queue_work_on(0, dt2w_input_wq, &dt2w_input_work);
+		schedule_work(&dt2w_input_work);
 	}
 }
 
 static int input_dev_filter(struct input_dev *dev) {
 	if (strstr(dev->name, "touch") ||
-		strstr(dev->name, "synaptics_dsx_i2c")) {
+		strstr(dev->name, "synaptics_dsx_i2c") ||
+		strstr(dev->name, "ft5x06_720p")) {
 		return 0;
-	} else {
-		return 1;
 	}
+	return 1;
 }
 
 static int dt2w_input_connect(struct input_handler *handler,
@@ -259,9 +270,11 @@ err2:
 }
 
 static void dt2w_input_disconnect(struct input_handle *handle) {
-	input_close_device(handle);
-	input_unregister_handle(handle);
-	kfree(handle);
+	if (handle) {
+		input_close_device(handle);
+		input_unregister_handle(handle);
+		kfree(handle);
+	}
 }
 
 static const struct input_device_id dt2w_ids[] = {
@@ -351,12 +364,9 @@ static int __init doubletap2wake_init(void)
 		goto err_input_dev;
 	}
 
-	dt2w_input_wq = create_workqueue("dt2wiwq");
-	if (!dt2w_input_wq) {
-		pr_err("%s: Failed to create dt2wiwq workqueue\n", __func__);
-		return -EFAULT;
-	}
 	INIT_WORK(&dt2w_input_work, dt2w_input_callback);
+	INIT_WORK(&doubletap2wake_presspwr_work, doubletap2wake_presspwr);
+
 	rc = input_register_handler(&dt2w_input_handler);
 	if (rc)
 		pr_err("%s: Failed to register dt2w_input_handler\n", __func__);
@@ -391,7 +401,6 @@ static void __exit doubletap2wake_exit(void)
 	kobject_del(android_touch_kobj);
 #endif
 	input_unregister_handler(&dt2w_input_handler);
-	destroy_workqueue(dt2w_input_wq);
 	input_unregister_device(doubletap2wake_pwrdev);
 	input_free_device(doubletap2wake_pwrdev);
 	return;
