@@ -298,6 +298,9 @@ struct ft5x06_ts_data {
         bool disable_keys;
 };
 
+#if (defined(CONFIG_TOUCHSCREEN_DOUBLETAP2WAKE) || defined(CONFIG_TOUCHSCREEN_SWEEP2WAKE))
+extern bool gesture_incall;
+#endif
 
 
 #define CTP_IC_TYPE_0 0x12
