@@ -253,7 +253,8 @@ static void s2w_input_event(struct input_handle *handle, unsigned int type,
 
 static int input_dev_filter(struct input_dev *dev) {
 	if (strstr(dev->name, "touch") ||
-		strstr(dev->name, "synaptics_dsx_i2c")) {
+		strstr(dev->name, "synaptics_dsx_i2c") ||
+		strstr(dev->name, "ft5x06_720p")) {
 		return 0;
 	} else {
 		return 1;
