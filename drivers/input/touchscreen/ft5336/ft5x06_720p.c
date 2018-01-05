@@ -843,24 +843,8 @@ static int fb_notifier_callback(struct notifier_block *self,
 		if (*blank == FB_BLANK_UNBLANK
 				|| *blank == FB_BLANK_NORMAL
 				|| *blank == FB_BLANK_VSYNC_SUSPEND) {
-			#if defined(CONFIG_TOUCHSCREEN_DOUBLETAP2WAKE) && !defined(CONFIG_TOUCHSCREEN_SWEEP2WAKE)
-				dt2w_scr_suspended = false;
-			#else if defined(CONFIG_TOUCHSCREEN_SWEEP2WAKE) && !defined(CONFIG_TOUCHSCREEN_DOUBLETAP2WAKE)
-				s2w_scr_suspended = false;
-			#else if defined(CONFIG_TOUCHSCREEN_DOUBLETAP2WAKE) && defined(CONFIG_TOUCHSCREEN_SWEEP2WAKE)
-				dt2w_scr_suspended = false;
-				s2w_scr_suspended = false;
-			#endif
 			schedule_work(&ft5x06_data->fb_notify_work);
 		} else if (*blank == FB_BLANK_POWERDOWN) {
-			#if defined(CONFIG_TOUCHSCREEN_DOUBLETAP2WAKE) && !defined(CONFIG_TOUCHSCREEN_SWEEP2WAKE)
-				dt2w_scr_suspended = true;
-			#else if defined(CONFIG_TOUCHSCREEN_SWEEP2WAKE) && !defined(CONFIG_TOUCHSCREEN_DOUBLETAP2WAKE)
-				s2w_scr_suspended = true;
-			#else if defined(CONFIG_TOUCHSCREEN_DOUBLETAP2WAKE) && defined(CONFIG_TOUCHSCREEN_SWEEP2WAKE)
-				dt2w_scr_suspended = true;
-				s2w_scr_suspended = true;
-			#endif
 
 			flush_work(&ft5x06_data->fb_notify_work);
 			ft5x06_ts_suspend(&ft5x06_data->client->dev);
