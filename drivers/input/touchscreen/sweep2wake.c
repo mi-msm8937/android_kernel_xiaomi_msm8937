@@ -98,9 +98,6 @@ static int __init read_s2w_cmdline(char *s2w)
 	if (strcmp(s2w, "1") == 0) {
 		pr_info("[cmdline_s2w]: Sweep2Wake enabled. | s2w='%s'\n", s2w);
 		s2w_switch = 1;
-	} else if (strcmp(s2w, "2") == 0) {
-		pr_info("[cmdline_s2w]: Sweep2Sleep enabled. | s2w='%s'\n", s2w);
-		s2w_switch = 2;
 	} else if (strcmp(s2w, "0") == 0) {
 		pr_info("[cmdline_s2w]: Sweep2Wake disabled. | s2w='%s'\n", s2w);
 		s2w_switch = 0;
@@ -170,36 +167,6 @@ static void detect_sweep2wake(int x, int y)
 					if (x > (S2W_X_MAX - S2W_X_FINAL)) {
 						if (exec_count) {
 							pr_info(LOGTAG"ON\n");
-							sweep2wake_pwrtrigger();
-							exec_count = false;
-						}
-					}
-				}
-			}
-		}
-	//right->left
-	} else if ((is_display_on()) && (s2w_switch > 0)) {
-		scr_on_touch=true;
-		prevx = (S2W_X_MAX - S2W_X_FINAL);
-		nextx = S2W_X_B2;
-		if ((barrier[0] == true) ||
-		   ((x < prevx) &&
-		    (x > nextx) &&
-		    (y > S2W_Y_LIMIT))) {
-			prevx = nextx;
-			nextx = S2W_X_B1;
-			barrier[0] = true;
-			if ((barrier[1] == true) ||
-			   ((x < prevx) &&
-			    (x > nextx) &&
-			    (y > S2W_Y_LIMIT))) {
-				prevx = nextx;
-				barrier[1] = true;
-				if ((x < prevx) &&
-				    (y > S2W_Y_LIMIT)) {
-					if (x < S2W_X_FINAL) {
-						if (exec_count) {
-							pr_info(LOGTAG"OFF\n");
 							sweep2wake_pwrtrigger();
 							exec_count = false;
 						}
