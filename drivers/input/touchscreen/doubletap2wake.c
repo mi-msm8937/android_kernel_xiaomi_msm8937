@@ -3,6 +3,7 @@
  *
  *
  * Copyright (c) 2013, Dennis Rassmann <showp1984@gmail.com>
+ * Copyright (c) 2017, Tanish <tanish2k09.dev@gmail.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -42,9 +43,9 @@
 #endif
 
 /* Version, author, desc, etc */
-#define DRIVER_AUTHOR "Dennis Rassmann <showp1984@gmail.com>"
+#define DRIVER_AUTHOR "Tanish <tanish2k09.dev@gmail.com>"
 #define DRIVER_DESCRIPTION "Doubletap2wake for almost any device"
-#define DRIVER_VERSION "1.0"
+#define DRIVER_VERSION "2.0"
 #define LOGTAG "[doubletap2wake]: "
 
 MODULE_AUTHOR(DRIVER_AUTHOR);
@@ -56,9 +57,9 @@ MODULE_LICENSE("GPLv2");
 #define DT2W_DEBUG		0
 #define DT2W_DEFAULT		0
 
-#define DT2W_PWRKEY_DUR		30
-#define DT2W_FEATHER		200
-#define DT2W_TIME		700
+#define DT2W_PWRKEY_DUR		60
+#define DT2W_RADIUS		200
+#define DT2W_TIME		400
 
 /* Resources */
 int dt2w_switch = DT2W_DEFAULT;
@@ -118,14 +119,14 @@ static void doubletap2wake_pwrtrigger(void) {
         return;
 }
 
-/* unsigned */
-static unsigned int calc_feather(int coord, int prev_coord) {
-	int calc_coord = 0;
-	calc_coord = coord-prev_coord;
-	if (calc_coord < 0)
-		calc_coord = calc_coord * (-1);
-	return calc_coord;
+/* bool */
+static bool calc_within_range(int x_pre, int y_pre, int x_new, int y_new, int radius_max) {
+	int calc_radius = ((x_new-x_pre)*(x_new-x_pre)) + ((y_new-y_pre)*(y_new-y_pre)) ;
+    if (calc_radius < ((radius_max)*(radius_max)))
+        return true;
+    return false;
 }
+
 
 /* init a new touch */
 static void new_touch(int x, int y) {
@@ -136,44 +137,33 @@ static void new_touch(int x, int y) {
 }
 
 /* Doubletap2wake main function */
-static void detect_doubletap2wake(int x, int y, bool st)
+static void detect_doubletap2wake(int x, int y)
 {
-        bool single_touch = st;
-#if DT2W_DEBUG
-        pr_info(LOGTAG"x,y(%4d,%4d) single:%s\n",
-                x, y, (single_touch) ? "true" : "false");
-#endif
-	if ((single_touch) && (dt2w_switch > 0) && (exec_count) && (touch_cnt)) {
-		
-		if ((ktime_to_ms(ktime_get())-tap_time_pre) >= DT2W_TIME)
-			doubletap2wake_reset();
-		
-		if (touch_nr == 0) {
+	if ((dt2w_switch > 0) && (exec_count) && (touch_cnt)) {
+		touch_cnt = false;
+		if (touch_nr == 0) {        // This will be true on first touch
 			new_touch(x, y);
-		} else if (touch_nr == 1) {
-			if ((calc_feather(x, x_pre) < DT2W_FEATHER) &&
-			    (calc_feather(y, y_pre) < DT2W_FEATHER)) {
-				pr_info(LOGTAG"ON\n");
-				exec_count = false;
-				doubletap2wake_pwrtrigger();
-				doubletap2wake_reset();
-			} else {
+		}
+		else if (touch_nr == 1)     //This is true on second touch
+		{
+            // Check tap distance and time condtions
+			if ((calc_within_range(x_pre, y_pre,x,y, DT2W_RADIUS) == true) && ((ktime_to_ms(ktime_get())-tap_time_pre) < DT2W_TIME)){
+			    	exec_count = false;
+                		doubletap2wake_pwrtrigger();  // We queue the screen on first, as it takes more time to do than vibration.
+	    			doubletap2wake_reset();     // Here the touch number is also reset to 0, but the program executes as needed. See yourself.
+            		}
+			else {          //If the second tap isn't close or fast enough, reset previous coords, treat second tap as a separate first tap
 				doubletap2wake_reset();
 				new_touch(x, y);
 			}
 		}
-		/*if ((touch_nr > 1)) {
-			pr_info(LOGTAG"ON\n");
-			exec_count = false;
-			doubletap2wake_pwrtrigger();
-			doubletap2wake_reset();
-		}*/
 	}
 }
 
+
 static void dt2w_input_callback(struct work_struct *unused) {
 
-	detect_doubletap2wake(touch_x, touch_y, true);
+	detect_doubletap2wake(touch_x, touch_y);
 
 	return;
 }
