@@ -60,6 +60,10 @@ else
     endif
   endif
 endif
+ifeq ($(CONFIG_MACH_XIAOMI_ROVA), y)
+CONFIG_SND_SOC_AW87319=y
+export
+endif
 
 # Use USERINCLUDE when you must reference the UAPI directories only.
 USERINCLUDE     += \
