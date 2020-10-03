@@ -1639,7 +1639,7 @@ static int gtp_request_irq(struct goodix_ts_data *ts)
 			 ts->client->irq, ts->pdata->irq_flags);
 		ret = request_threaded_irq(ts->client->irq, NULL,
 				gtp_irq_handler,
-				ts->pdata->irq_flags | IRQF_ONESHOT,
+				ts->pdata->irq_flags | IRQF_ONESHOT | IRQF_PERF_CRITICAL,
 				ts->client->name,
 				ts);
 		if (ret < 0) {
