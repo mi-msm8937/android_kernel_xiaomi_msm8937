@@ -64,7 +64,7 @@
 #define GTP_ADDR_LENGTH       2
 
 /***************************PART1:ON/OFF define*******************************/
-#define GTP_DEBUG_ON          1
+#define GTP_DEBUG_ON          0
 #define GTP_DEBUG_ARRAY_ON    0
 #define GTP_DEBUG_FUNC_ON     0
 
