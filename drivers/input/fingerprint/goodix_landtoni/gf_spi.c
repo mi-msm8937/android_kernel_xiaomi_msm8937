@@ -296,7 +296,7 @@ static long gf_ioctl(struct file *filp, unsigned int cmd, unsigned long arg)
 		driver_init_partial(gf_dev);
 		break;
 	case GF_IOC_RELEASE_GPIO:
-		gf_cleanup(gf_dev);
+		landtoni_gf_cleanup(gf_dev);
 		break;
 	case GF_IOC_DISABLE_IRQ:
 		gf_disable_irq(gf_dev);
@@ -323,12 +323,12 @@ static long gf_ioctl(struct file *filp, unsigned int cmd, unsigned long arg)
 #endif
 		break;
 	case GF_IOC_RESET:
-		gf_hw_reset(gf_dev, 3);
+		landtoni_gf_hw_reset(gf_dev, 3);
 		break;
 	case GF_IOC_COOLBOOT:
-		gf_power_off(gf_dev);
+		landtoni_gf_power_off(gf_dev);
 		mdelay(5);
-		gf_power_on(gf_dev);
+		landtoni_gf_power_on(gf_dev);
 		break;
 	case GF_IOC_SENDKEY:
 		if (copy_from_user
@@ -380,14 +380,14 @@ static long gf_ioctl(struct file *filp, unsigned int cmd, unsigned long arg)
 		if (gf_dev->device_available == 1)
 			pr_info("Sensor has already powered-on.\n");
 		else
-			gf_power_on(gf_dev);
+			landtoni_gf_power_on(gf_dev);
 			gf_dev->device_available = 1;
 		break;
 	case GF_IOC_POWER_OFF:
 		if (gf_dev->device_available == 0)
 			pr_info("Sensor has already powered-off.\n");
 		else
-			gf_power_off(gf_dev);
+			landtoni_gf_power_off(gf_dev);
 			gf_dev->device_available = 0;
 		break;
 		default:
@@ -418,7 +418,7 @@ static irqreturn_t gf_irq(int irq, void *handle)
 
 	__pm_wakeup_event(&gf_dev->ttw_wl, 1000);
 
-	sendnlmsg(&temp);
+	landtoni_sendnlmsg(&temp);
 #elif defined (GF_FASYNC)
 
 	struct gf_dev *gf_dev = &gf;
@@ -438,10 +438,10 @@ static int driver_init_partial(struct gf_dev *gf_dev)
 
 	gf_dev->device_available = 1;
 
-	if (gf_parse_dts(gf_dev))
+	if (landtoni_gf_parse_dts(gf_dev))
 		goto error;
 
-	gf_dev->irq = gf_irq_num(gf_dev);
+	gf_dev->irq = landtoni_gf_irq_num(gf_dev);
 	ret = devm_request_threaded_irq(&gf_dev->spi->dev,
 					gf_dev->irq,
 					NULL,
@@ -457,14 +457,14 @@ static int driver_init_partial(struct gf_dev *gf_dev)
 		gf_disable_irq(gf_dev);
 	}
 
-	gf_hw_reset(gf_dev, 360);
+	landtoni_gf_hw_reset(gf_dev, 360);
 
 	FUNC_EXIT();
 	return 0;
 
 error:
 
-	gf_cleanup(gf_dev);
+	landtoni_gf_cleanup(gf_dev);
 
 	gf_dev->device_available = 0;
 
@@ -547,7 +547,7 @@ static int gf_release(struct inode *inode, struct file *filp)
 
 /*power off the sensor*/
 	gf_dev->device_available = 0;
-	gf_power_off(gf_dev);
+	landtoni_gf_power_off(gf_dev);
 	}
 	mutex_unlock(&device_list_lock);
 	FUNC_EXIT();
@@ -595,7 +595,7 @@ static int goodix_fb_state_chg_callback(struct notifier_block *nb,
 				gf_dev->fb_black = 1;
 #if defined(GF_NETLINK_ENABLE)
 				temp = GF_NET_EVENT_FB_BLACK;
-				sendnlmsg(&temp);
+				landtoni_sendnlmsg(&temp);
 #elif defined (GF_FASYNC)
 				if (gf_dev->async) {
 					kill_fasync(&gf_dev->async, SIGIO,
@@ -609,7 +609,7 @@ static int goodix_fb_state_chg_callback(struct notifier_block *nb,
 				gf_dev->fb_black = 0;
 #if defined(GF_NETLINK_ENABLE)
 				temp = GF_NET_EVENT_FB_UNBLACK;
-				sendnlmsg(&temp);
+				landtoni_sendnlmsg(&temp);
 #elif defined (GF_FASYNC)
 				if (gf_dev->async) {
 					kill_fasync(&gf_dev->async, SIGIO,
@@ -737,7 +737,7 @@ static int gf_probe(struct platform_device *pdev)
 	return status;
 
 error:
-	gf_cleanup(gf_dev);
+	landtoni_gf_cleanup(gf_dev);
 	gf_dev->device_available = 0;
 	if (gf_dev->devt != 0) {
 		pr_info("Err: status = %d\n", status);
@@ -878,7 +878,7 @@ static int __init gf_init(void)
 	}
 
 #ifdef GF_NETLINK_ENABLE
-		 netlink_init();
+		 landtoni_netlink_init();
 #endif
 	pr_info(" status = 0x%x\n", status);
 	FUNC_EXIT();
@@ -903,7 +903,7 @@ static void __exit gf_exit(void)
 #endif
 
 #ifdef GF_NETLINK_ENABLE
-	netlink_exit();
+	landtoni_netlink_exit();
 #endif
 #if defined(USE_PLATFORM_BUS)
 	platform_driver_unregister(&gf_driver);
