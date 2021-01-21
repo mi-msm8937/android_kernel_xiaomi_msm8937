@@ -126,3 +126,6 @@ Android.bp
 
 # Outdirs
 out*/*
+
+# ft5435 firmware
+!drivers/input/touchscreen/ft5435/include/firmware/*.i
