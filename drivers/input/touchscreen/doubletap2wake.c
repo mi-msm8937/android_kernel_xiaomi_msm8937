@@ -72,6 +72,10 @@ static DEFINE_MUTEX(pwrkeyworklock);
 static struct workqueue_struct *dt2w_input_wq;
 static struct work_struct dt2w_input_work;
 
+#ifdef CONFIG_TOUCHSCREEN_XIAOMI_DT2W
+extern bool xiaomi_dt2w_enable;
+#endif
+
 /* Read cmdline for dt2w */
 static int __init read_dt2w_cmdline(char *dt2w)
 {
@@ -288,6 +292,10 @@ static ssize_t dt2w_doubletap2wake_dump(struct device *dev,
 	if (buf[0] >= '0' && buf[0] <= '2' && buf[1] == '\n')
                 if (dt2w_switch != buf[0] - '0')
 		        dt2w_switch = buf[0] - '0';
+
+#ifdef CONFIG_TOUCHSCREEN_XIAOMI_DT2W
+	xiaomi_dt2w_enable = !!dt2w_switch;
+#endif
 
 	return count;
 }
