@@ -112,10 +112,10 @@ __setup("s2w=", read_s2w_cmdline);
 static void sweep2wake_presspwr(struct work_struct * sweep2wake_presspwr_work) {
 	if (!mutex_trylock(&pwrkeyworklock))
                 return;
-	input_event(sweep2wake_pwrdev, EV_KEY, KEY_POWER, 1);
+	input_event(sweep2wake_pwrdev, EV_KEY, KEY_WAKEUP, 1);
 	input_event(sweep2wake_pwrdev, EV_SYN, 0, 0);
 	msleep(s2w_pwrkey_dur);
-	input_event(sweep2wake_pwrdev, EV_KEY, KEY_POWER, 0);
+	input_event(sweep2wake_pwrdev, EV_KEY, KEY_WAKEUP, 0);
 	input_event(sweep2wake_pwrdev, EV_SYN, 0, 0);
 	msleep(s2w_pwrkey_dur);
         mutex_unlock(&pwrkeyworklock);
@@ -386,7 +386,7 @@ static int __init sweep2wake_init(void)
 		goto err_alloc_dev;
 	}
 
-	input_set_capability(sweep2wake_pwrdev, EV_KEY, KEY_POWER);
+	input_set_capability(sweep2wake_pwrdev, EV_KEY, KEY_WAKEUP);
 	sweep2wake_pwrdev->name = "s2w_pwrkey";
 	sweep2wake_pwrdev->phys = "s2w_pwrkey/input0";
 
