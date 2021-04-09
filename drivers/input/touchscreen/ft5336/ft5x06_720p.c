@@ -40,6 +40,9 @@
 
 #ifdef CONFIG_TOUCHSCREEN_DOUBLETAP2WAKE
 #include <linux/input/doubletap2wake.h>
+#ifdef CONFIG_TOUCHSCREEN_XIAOMI_DT2W
+extern bool xiaomi_dt2w_enable;
+#endif
 #endif
 
 #if CTP_CHARGER_DETECT
@@ -648,6 +651,12 @@ static int ft5x06_ts_suspend(struct device *dev)
 	int err;
 
 #ifdef CONFIG_TOUCHSCREEN_DOUBLETAP2WAKE
+#ifdef CONFIG_TOUCHSCREEN_XIAOMI_DT2W
+	if (xiaomi_dt2w_enable)
+		dt2w_switch = 2;
+	else
+		dt2w_switch = 0;
+#endif
 #ifdef CONFIG_NO_TECHPACK_AUDIO
 	if (dt2w_switch > 0) {
 #else
