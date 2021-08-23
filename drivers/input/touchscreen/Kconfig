@@ -1481,9 +1481,4 @@ source "drivers/input/touchscreen/FT5346/Kconfig"
 
 source "drivers/input/touchscreen/ft5336/Kconfig"
 
-config TOUCHSCREEN_DOUBLETAP2WAKE
-	bool "DoubleTap2Wake for touchscreens"
-	depends on TOUCHSCREEN_FT5336
-	default n
-
 endif

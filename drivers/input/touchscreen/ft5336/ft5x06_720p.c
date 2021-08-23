@@ -38,13 +38,6 @@
 #include <linux/hardware_info.h>
 #endif
 
-#ifdef CONFIG_TOUCHSCREEN_DOUBLETAP2WAKE
-#include <linux/input/doubletap2wake.h>
-#ifdef CONFIG_TOUCHSCREEN_XIAOMI_DT2W
-extern bool xiaomi_dt2w_enable;
-#endif
-#endif
-
 #if CTP_CHARGER_DETECT
 #include <linux/power_supply.h>
 #endif
@@ -184,18 +177,6 @@ static u8 pre_charger_status = 0;
 
 #if CTP_PROC_INTERFACE
 static struct i2c_client *g_focalclient = NULL;
-#endif
-
-#ifdef CONFIG_TOUCHSCREEN_DOUBLETAP2WAKE
-static bool lcd_on = true;
-static void set_lcd_status(bool scr_on)
-{
-	lcd_on = scr_on;
-}
-bool dt2w_scr_on(void)
-{
-	return lcd_on;
-}
 #endif
 
 #if CTP_PROC_INTERFACE
@@ -624,24 +605,6 @@ static int ft5x06_ts_pinctrl_select(struct ft5x06_ts_data *ft5x06_data,
 	return 0;
 }
 
-#ifdef CONFIG_TOUCHSCREEN_DOUBLETAP2WAKE
-static bool ev_btn_status = false;
-static bool ft5x06_irq_active = false;
-static void ft5x06_irq_handler(int irq, bool active)
-{
-	if (active) {
-		if (!ft5x06_irq_active) {
-			enable_irq_wake(irq);
-			ft5x06_irq_active = true;
-		}
-	} else {
-		if (ft5x06_irq_active) {
-			disable_irq_wake(irq);
-			ft5x06_irq_active = false;
-		}
-	}
-}
-#endif
 
 #ifdef CONFIG_PM
 static int ft5x06_ts_suspend(struct device *dev)
@@ -649,34 +612,6 @@ static int ft5x06_ts_suspend(struct device *dev)
 	struct ft5x06_ts_data *data = dev_get_drvdata(dev);
 	char txbuf[2], i;
 	int err;
-
-#ifdef CONFIG_TOUCHSCREEN_DOUBLETAP2WAKE
-#ifdef CONFIG_TOUCHSCREEN_XIAOMI_DT2W
-	if (xiaomi_dt2w_enable)
-		dt2w_switch = 2;
-	else
-		dt2w_switch = 0;
-#endif
-#ifdef CONFIG_NO_TECHPACK_AUDIO
-	if (dt2w_switch > 0) {
-#else
-	if (dt2w_switch > 0 && !dt2w_incall_on()) {
-#endif
-		if (!ev_btn_status) {
-			/* release all touches */
-			for (i = 0; i < data->pdata->num_max_touches; i++) {
-				input_mt_slot(data->input_dev, i);
-				input_mt_report_slot_state(data->input_dev, MT_TOOL_FINGER, 0);
-			}
-			input_mt_report_pointer_emulation(data->input_dev, false);
-			__clear_bit(BTN_TOUCH, data->input_dev->keybit);
-			input_sync(data->input_dev);
-			ev_btn_status = true;
-		}
-		ft5x06_irq_handler(data->client->irq, true);
-		return 0;
-	}
-#endif
 
 	if (data->loading_fw) {
 		dev_info(dev, "Firmware loading in process...\n");
@@ -741,17 +676,6 @@ static int ft5x06_ts_resume(struct device *dev)
 {
 	struct ft5x06_ts_data *data = dev_get_drvdata(dev);
 	int err;
-
-#ifdef CONFIG_TOUCHSCREEN_DOUBLETAP2WAKE
-	if (dt2w_switch > 0) {
-		if (ev_btn_status) {
-			__set_bit(BTN_TOUCH, data->input_dev->keybit);
-			input_sync(data->input_dev);
-			ev_btn_status = false;
-		}
-		ft5x06_irq_handler(data->client->irq, false);
-	}
-#endif
 
 	if (!data->suspended) {
 		dev_dbg(dev, "Already in awake state\n");
@@ -846,15 +770,9 @@ static int fb_notifier_callback(struct notifier_block *self,
 	if (evdata && evdata->data && event == FB_EVENT_BLANK &&
 			ft5x06_data && ft5x06_data->client) {
 		blank = evdata->data;
-		if (*blank == FB_BLANK_UNBLANK) {
-#ifdef CONFIG_TOUCHSCREEN_DOUBLETAP2WAKE
-			set_lcd_status(true);
-#endif
-			schedule_work(&ft5x06_data->fb_notify_work);
-		} else if (*blank == FB_BLANK_POWERDOWN) {
-#ifdef CONFIG_TOUCHSCREEN_DOUBLETAP2WAKE
-			set_lcd_status(false);
-#endif
+		if (*blank == FB_BLANK_UNBLANK)
+				schedule_work(&ft5x06_data->fb_notify_work);
+		else if (*blank == FB_BLANK_POWERDOWN) {
 			flush_work(&ft5x06_data->fb_notify_work);
 			ft5x06_ts_suspend(&ft5x06_data->client->dev);
 		}
