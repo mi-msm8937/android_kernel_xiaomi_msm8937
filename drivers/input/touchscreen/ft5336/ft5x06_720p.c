@@ -47,6 +47,10 @@
 #include <linux/input/sweep2wake.h>
 #endif
 
+#ifdef CONFIG_TOUCHSCREEN_XIAOMI_DT2W
+extern bool xiaomi_dt2w_enable;
+#endif
+
 #if CTP_CHARGER_DETECT
 #include <linux/power_supply.h>
 #endif
@@ -639,6 +643,10 @@ static int ft5x06_ts_suspend(struct device *dev)
 	struct ft5x06_ts_data *data = dev_get_drvdata(dev);
 	char txbuf[2], i;
 	int err;
+
+#ifdef CONFIG_TOUCHSCREEN_XIAOMI_DT2W
+	dt2w_switch = xiaomi_dt2w_enable;
+#endif
 
 #if (defined(CONFIG_TOUCHSCREEN_DOUBLETAP2WAKE) && !defined(CONFIG_TOUCHSCREEN_SWEEP2WAKE))
 	if (dt2w_switch > 0 && !gesture_incall) {
