@@ -61,6 +61,10 @@
 #include <linux/input/sweep2wake.h>
 #endif
 
+#ifdef CONFIG_TOUCHSCREEN_XIAOMI_DT2W
+extern bool xiaomi_dt2w_enable;
+#endif
+
 #ifdef CONFIG_OF
 #include <linux/of.h>
 #include <linux/of_gpio.h>
@@ -1288,6 +1292,10 @@ static int ist30xx_suspend(struct device *dev)
 {
 	struct ist30xx_data *data = dev_get_drvdata(dev);
 	int i;
+
+#ifdef CONFIG_TOUCHSCREEN_XIAOMI_DT2W
+	dt2w_switch = xiaomi_dt2w_enable;
+#endif
 
 #if (defined(CONFIG_TOUCHSCREEN_DOUBLETAP2WAKE) && !defined(CONFIG_TOUCHSCREEN_SWEEP2WAKE))
 	if (dt2w_switch > 0 && !gesture_incall) {
