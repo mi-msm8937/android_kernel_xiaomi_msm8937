@@ -33,6 +33,9 @@
  * 1.Included header files
  *****************************************************************************/
 #include "focaltech_core.h"
+#ifdef CONFIG_TOUCHSCREEN_XIAOMI_DT2W
+#include <linux/input/xiaomi_dt2w.h>
+#endif
 #if FTS_GESTURE_EN
 /******************************************************************************
  * Private constant and macro definitions using #define
@@ -247,6 +250,10 @@ static ssize_t fts_gesture_buf_store(struct device *dev,
 int fts_create_gesture_sysfs(struct i2c_client *client)
 {
 	int ret = 0;
+
+#ifdef CONFIG_TOUCHSCREEN_XIAOMI_DT2W
+		return 0;
+#endif
 
 	ret = sysfs_create_group(&client->dev.kobj, &fts_gesture_group);
 	if (ret != 0) {
@@ -505,6 +512,10 @@ int fts_gesture_suspend(struct i2c_client *i2c_client)
 	u8 state;
 
 	FTS_FUNC_ENTER();
+
+#ifdef CONFIG_TOUCHSCREEN_XIAOMI_DT2W
+		fts_gesture_data.mode = xiaomi_dt2w_enable;
+#endif
 
 	/* gesture not enable, return immediately */
 	if (fts_gesture_data.mode == 0) {
