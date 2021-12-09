@@ -691,6 +691,7 @@ endif
 dtb-$(CONFIG_MACH_XIAOMI_TIARE) += msm8917-pmi8937-qrd-sku5-tiare.dtb
 dtb-$(CONFIG_MACH_XIAOMI_LAND) += msm8937-pmi8950-qrd-land.dtb
 dtb-$(CONFIG_MACH_XIAOMI_SANTONI) += msm8940-pmi8950-qrd-sku7-santoni.dtb
+dtb-$(CONFIG_MACH_XIAOMI_PRADA) += msm8937-pmi8950-mtp-prada.dtb
 
 always		:= $(dtb-y)
 subdir-y	:= $(dts-dirs)
