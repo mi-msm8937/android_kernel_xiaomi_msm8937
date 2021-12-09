@@ -52,14 +52,14 @@ extern unsigned char AW87319_Audio_OFF(void);
 #endif
 
 #define DRV_NAME "msm8952-asoc-wcd"
-#if defined(CONFIG_MACH_XIAOMI_LAND) || defined(CONFIG_MACH_XIAOMI_SANTONI)
+#if defined(CONFIG_MACH_XIAOMI_LAND) || defined(CONFIG_MACH_XIAOMI_SANTONI) || defined(CONFIG_MACH_XIAOMI_PRADA)
 #define LANDTONI_AW8738_MODE 5
 #endif
 
 #define MSM_INT_DIGITAL_CODEC "msm-dig-codec"
 #define PMIC_INT_ANALOG_CODEC "analog-codec"
 
-#if defined(CONFIG_MACH_XIAOMI_LAND) || defined(CONFIG_MACH_XIAOMI_SANTONI)
+#if defined(CONFIG_MACH_XIAOMI_LAND) || defined(CONFIG_MACH_XIAOMI_SANTONI) || defined(CONFIG_MACH_XIAOMI_PRADA)
 #define LANDTONI_EXT_CLASS_D_EN_DELAY 13000
 #define LANDTONI_EXT_CLASS_D_DIS_DELAY 3000
 #define LANDTONI_EXT_CLASS_D_DELAY_DELTA 2000
@@ -98,7 +98,7 @@ static int rova_headset_gpio;
 static int rova_spk_pa_gpio;
 #endif
 
-#if defined(CONFIG_MACH_XIAOMI_LAND) || defined(CONFIG_MACH_XIAOMI_SANTONI)
+#if defined(CONFIG_MACH_XIAOMI_LAND) || defined(CONFIG_MACH_XIAOMI_SANTONI) || defined(CONFIG_MACH_XIAOMI_PRADA)
 static int landtoni_headset_gpio;
 static int landtoni_spk_pa_gpio;
 
@@ -185,7 +185,7 @@ static const char *const vi_feed_ch_text[] = {"One", "Two"};
 static char const *mi2s_rx_sample_rate_text[] = {"KHZ_48",
 					"KHZ_96", "KHZ_192"};
 
-#if defined(CONFIG_MACH_XIAOMI_ROVA) || defined(CONFIG_MACH_XIAOMI_TIARE) || defined(CONFIG_MACH_XIAOMI_LAND) || defined(CONFIG_MACH_XIAOMI_SANTONI)
+#if defined(CONFIG_MACH_XIAOMI_ROVA) || defined(CONFIG_MACH_XIAOMI_TIARE) || defined(CONFIG_MACH_XIAOMI_LAND) || defined(CONFIG_MACH_XIAOMI_SANTONI) || defined(CONFIG_MACH_XIAOMI_PRADA)
 static const char *const rova_landtoni_lineout_text[] = {"DISABLE", "ENABLE", "DUALMODE"};
 static const char *const rova_landtoni_hs_amp_text[] = {"DISABLE", "ENABLE"};
 #endif
@@ -1116,7 +1116,7 @@ exit:
 }
 #endif
 
-#if defined(CONFIG_MACH_XIAOMI_LAND) || defined(CONFIG_MACH_XIAOMI_SANTONI)
+#if defined(CONFIG_MACH_XIAOMI_LAND) || defined(CONFIG_MACH_XIAOMI_SANTONI) || defined(CONFIG_MACH_XIAOMI_PRADA)
 static void landtoni_msm8952_ext_hs_control(u32 enable)
 {
 
@@ -1564,13 +1564,13 @@ static const struct soc_enum msm_snd_enum[] = {
 				vi_feed_ch_text),
 	SOC_ENUM_SINGLE_EXT(ARRAY_SIZE(mi2s_rx_sample_rate_text),
 				mi2s_rx_sample_rate_text),
-#if defined(CONFIG_MACH_XIAOMI_ROVA) || defined(CONFIG_MACH_XIAOMI_TIARE) || defined(CONFIG_MACH_XIAOMI_LAND) || defined(CONFIG_MACH_XIAOMI_SANTONI)
+#if defined(CONFIG_MACH_XIAOMI_ROVA) || defined(CONFIG_MACH_XIAOMI_TIARE) || defined(CONFIG_MACH_XIAOMI_LAND) || defined(CONFIG_MACH_XIAOMI_SANTONI) || defined(CONFIG_MACH_XIAOMI_PRADA)
 	SOC_ENUM_SINGLE_EXT(ARRAY_SIZE(rova_landtoni_lineout_text), rova_landtoni_lineout_text),
 	SOC_ENUM_SINGLE_EXT(ARRAY_SIZE(rova_landtoni_hs_amp_text), rova_landtoni_hs_amp_text),
 #endif
 };
 
-#if defined(CONFIG_MACH_XIAOMI_ROVA) || defined(CONFIG_MACH_XIAOMI_TIARE) || defined(CONFIG_MACH_XIAOMI_LAND) || defined(CONFIG_MACH_XIAOMI_SANTONI)
+#if defined(CONFIG_MACH_XIAOMI_ROVA) || defined(CONFIG_MACH_XIAOMI_TIARE) || defined(CONFIG_MACH_XIAOMI_LAND) || defined(CONFIG_MACH_XIAOMI_SANTONI) || defined(CONFIG_MACH_XIAOMI_PRADA)
 static int rova_landtoni_lineout_status_get(struct snd_kcontrol *kcontrol,
 	struct snd_ctl_elem_value *ucontrol)
 {
@@ -1578,8 +1578,8 @@ static int rova_landtoni_lineout_status_get(struct snd_kcontrol *kcontrol,
 	if (xiaomi_series_read() == XIAOMI_SERIES_ROVA)
 		return rova_lineout_status_get(kcontrol,ucontrol);
 #endif
-#if defined(CONFIG_MACH_XIAOMI_LAND) || defined(CONFIG_MACH_XIAOMI_SANTONI)
-	if (xiaomi_series_read() == XIAOMI_SERIES_LANDTONI)
+#if defined(CONFIG_MACH_XIAOMI_LAND) || defined(CONFIG_MACH_XIAOMI_SANTONI) || defined(CONFIG_MACH_XIAOMI_PRADA)
+	if (xiaomi_series_read() == XIAOMI_SERIES_LANDTONI || xiaomi_device_read() == XIAOMI_DEVICE_PRADA)
 		return landtoni_lineout_status_get(kcontrol,ucontrol);
 #endif
 	return 0;
@@ -1592,8 +1592,8 @@ static int rova_landtoni_lineout_status_put(struct snd_kcontrol *kcontrol,
 	if (xiaomi_series_read() == XIAOMI_SERIES_ROVA)
 		return rova_lineout_status_put(kcontrol,ucontrol);
 #endif
-#if defined(CONFIG_MACH_XIAOMI_LAND) || defined(CONFIG_MACH_XIAOMI_SANTONI)
-	if (xiaomi_series_read() == XIAOMI_SERIES_LANDTONI)
+#if defined(CONFIG_MACH_XIAOMI_LAND) || defined(CONFIG_MACH_XIAOMI_SANTONI) || defined(CONFIG_MACH_XIAOMI_PRADA)
+	if (xiaomi_series_read() == XIAOMI_SERIES_LANDTONI || xiaomi_device_read() == XIAOMI_DEVICE_PRADA)
 		return landtoni_lineout_status_put(kcontrol,ucontrol);
 #endif
 	return 0;
@@ -1606,8 +1606,8 @@ static int rova_landtoni_headset_status_get(struct snd_kcontrol *kcontrol,
 	if (xiaomi_series_read() == XIAOMI_SERIES_ROVA)
 		return rova_headset_status_get(kcontrol,ucontrol);
 #endif
-#if defined(CONFIG_MACH_XIAOMI_LAND) || defined(CONFIG_MACH_XIAOMI_SANTONI)
-	if (xiaomi_series_read() == XIAOMI_SERIES_LANDTONI)
+#if defined(CONFIG_MACH_XIAOMI_LAND) || defined(CONFIG_MACH_XIAOMI_SANTONI) || defined(CONFIG_MACH_XIAOMI_PRADA)
+	if (xiaomi_series_read() == XIAOMI_SERIES_LANDTONI || xiaomi_device_read() == XIAOMI_DEVICE_PRADA)
 		return landtoni_headset_status_get(kcontrol,ucontrol);
 #endif
 	return 0;
@@ -1620,8 +1620,8 @@ static int rova_landtoni_headset_status_put(struct snd_kcontrol *kcontrol,
 	if (xiaomi_series_read() == XIAOMI_SERIES_ROVA)
 		return rova_headset_status_put(kcontrol,ucontrol);
 #endif
-#if defined(CONFIG_MACH_XIAOMI_LAND) || defined(CONFIG_MACH_XIAOMI_SANTONI)
-	if (xiaomi_series_read() == XIAOMI_SERIES_LANDTONI)
+#if defined(CONFIG_MACH_XIAOMI_LAND) || defined(CONFIG_MACH_XIAOMI_SANTONI) || defined(CONFIG_MACH_XIAOMI_PRADA)
+	if (xiaomi_series_read() == XIAOMI_SERIES_LANDTONI || xiaomi_device_read() == XIAOMI_DEVICE_PRADA)
 		return landtoni_headset_status_put(kcontrol,ucontrol);
 #endif
 	return 0;
@@ -1645,7 +1645,7 @@ static const struct snd_kcontrol_new msm_snd_controls[] = {
 			msm_vi_feed_tx_ch_get, msm_vi_feed_tx_ch_put),
 	SOC_ENUM_EXT("MI2S_RX SampleRate", msm_snd_enum[6],
 			mi2s_rx_sample_rate_get, mi2s_rx_sample_rate_put),
-#if defined(CONFIG_MACH_XIAOMI_ROVA) || defined(CONFIG_MACH_XIAOMI_TIARE) || defined(CONFIG_MACH_XIAOMI_LAND) || defined(CONFIG_MACH_XIAOMI_SANTONI)
+#if defined(CONFIG_MACH_XIAOMI_ROVA) || defined(CONFIG_MACH_XIAOMI_TIARE) || defined(CONFIG_MACH_XIAOMI_LAND) || defined(CONFIG_MACH_XIAOMI_SANTONI) || defined(CONFIG_MACH_XIAOMI_PRADA)
 	SOC_ENUM_EXT("Lineout_1 amp", msm_snd_enum[7],
 				rova_landtoni_lineout_status_get, rova_landtoni_lineout_status_put),
 	SOC_ENUM_EXT("headset amp", msm_snd_enum[8],
@@ -2097,8 +2097,8 @@ static void *def_msm8952_wcd_mbhc_cal(void)
 		return NULL;
 
 #define S(X, Y) ((WCD_MBHC_CAL_PLUG_TYPE_PTR(msm8952_wcd_cal)->X) = (Y))
-#if defined(CONFIG_MACH_XIAOMI_ULYSSE) || defined(CONFIG_MACH_XIAOMI_LAND) || defined(CONFIG_MACH_XIAOMI_SANTONI)
-	if (xiaomi_series_read() == XIAOMI_SERIES_ULYSSE || xiaomi_series_read() == XIAOMI_SERIES_LANDTONI) {
+#if defined(CONFIG_MACH_XIAOMI_ULYSSE) || defined(CONFIG_MACH_XIAOMI_LAND) || defined(CONFIG_MACH_XIAOMI_SANTONI) || defined(CONFIG_MACH_XIAOMI_PRADA)
+	if (xiaomi_series_read() == XIAOMI_SERIES_ULYSSE || xiaomi_series_read() == XIAOMI_SERIES_LANDTONI || xiaomi_device_read() == XIAOMI_DEVICE_PRADA) {
 		S(v_hs_max, 1600);		/*increase vref for more headphone compatibility*/
 	} else
 #endif
@@ -2154,8 +2154,8 @@ static void *def_msm8952_wcd_mbhc_cal(void)
 	}
 #endif
 
-#if defined(CONFIG_MACH_XIAOMI_ROVA) || defined(CONFIG_MACH_XIAOMI_TIARE) || defined(CONFIG_MACH_XIAOMI_LAND) || defined(CONFIG_MACH_XIAOMI_SANTONI)
-	if (xiaomi_series_read() == XIAOMI_SERIES_ROVA || xiaomi_series_read() == XIAOMI_SERIES_LANDTONI) {
+#if defined(CONFIG_MACH_XIAOMI_ROVA) || defined(CONFIG_MACH_XIAOMI_TIARE) || defined(CONFIG_MACH_XIAOMI_LAND) || defined(CONFIG_MACH_XIAOMI_SANTONI) || defined(CONFIG_MACH_XIAOMI_PRADA)
+	if (xiaomi_series_read() == XIAOMI_SERIES_ROVA || xiaomi_series_read() == XIAOMI_SERIES_LANDTONI || xiaomi_device_read() == XIAOMI_DEVICE_PRADA) {
 		btn_low[0] = 25;
 		btn_high[0] = 75;
 		btn_low[1] = 200;
@@ -2218,8 +2218,8 @@ static int msm_audrx_init(struct snd_soc_pcm_runtime *rtd)
 		}
 	}
 
-#if defined(CONFIG_MACH_XIAOMI_LAND) || defined(CONFIG_MACH_XIAOMI_SANTONI)
-	if (xiaomi_series_read() == XIAOMI_SERIES_LANDTONI) {
+#if defined(CONFIG_MACH_XIAOMI_LAND) || defined(CONFIG_MACH_XIAOMI_SANTONI) || defined(CONFIG_MACH_XIAOMI_PRADA)
+	if (xiaomi_series_read() == XIAOMI_SERIES_LANDTONI || xiaomi_device_read() == XIAOMI_DEVICE_PRADA) {
 		INIT_DELAYED_WORK(&landtoni_lineout_amp_enable, landtoni_msm8952_ext_spk__delayed_enable);
 
 		INIT_DELAYED_WORK(&landtoni_lineout_amp_dualmode, landtoni_msm8x16_ext_spk_delayed_dualmode);
@@ -3757,8 +3757,8 @@ static int msm8952_asoc_machine_probe(struct platform_device *pdev)
 	}
 #endif
 
-#if defined(CONFIG_MACH_XIAOMI_ROVA) || defined(CONFIG_MACH_XIAOMI_TIARE) || defined(CONFIG_MACH_XIAOMI_LAND) || defined(CONFIG_MACH_XIAOMI_SANTONI)
-	if (xiaomi_series_read() == XIAOMI_SERIES_ROVA || xiaomi_series_read() == XIAOMI_SERIES_LANDTONI) {
+#if defined(CONFIG_MACH_XIAOMI_ROVA) || defined(CONFIG_MACH_XIAOMI_TIARE) || defined(CONFIG_MACH_XIAOMI_LAND) || defined(CONFIG_MACH_XIAOMI_SANTONI) || defined(CONFIG_MACH_XIAOMI_PRADA)
+	if (xiaomi_series_read() == XIAOMI_SERIES_ROVA || xiaomi_series_read() == XIAOMI_SERIES_LANDTONI || xiaomi_device_read() == XIAOMI_DEVICE_PRADA) {
 		mbhc_cfg.key_code[1] = 251; /* KEY_PREVIOUSSONG_NEW */
 		mbhc_cfg.key_code[2] = 250; /* KEY_NEXTSONG_NEW */
 		mbhc_cfg.key_code[3] = KEY_VOICECOMMAND;
@@ -3870,8 +3870,8 @@ parse_mclk_freq:
 		pr_debug("%s:request rova_headset_gpio is %d!\n", __func__, rova_headset_gpio);
 	}
 #endif
-#if defined(CONFIG_MACH_XIAOMI_LAND) || defined(CONFIG_MACH_XIAOMI_SANTONI)
-	if (xiaomi_series_read() == XIAOMI_SERIES_LANDTONI) {
+#if defined(CONFIG_MACH_XIAOMI_LAND) || defined(CONFIG_MACH_XIAOMI_SANTONI) || defined(CONFIG_MACH_XIAOMI_PRADA)
+	if (xiaomi_series_read() == XIAOMI_SERIES_LANDTONI || xiaomi_device_read() == XIAOMI_DEVICE_PRADA) {
 		landtoni_spk_pa_gpio = of_get_named_gpio(pdev->dev.of_node, "ext-spk-amp-gpio", 0);
 		if (landtoni_spk_pa_gpio < 0) {
 			dev_err(&pdev->dev,
