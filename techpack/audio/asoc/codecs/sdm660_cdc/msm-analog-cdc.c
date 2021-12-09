@@ -34,6 +34,11 @@
 #include "../wcd-mbhc-v2-api.h"
 
 #ifdef CONFIG_MACH_XIAOMI
+#include <linux/xiaomi_device.h>
+extern int xiaomi_device_read(void);
+#endif
+
+#ifdef CONFIG_MACH_XIAOMI
 #include <linux/xiaomi_series.h>
 extern int xiaomi_series_read(void);
 #endif
@@ -589,8 +594,8 @@ static void msm_anlg_cdc_mbhc_internal_micbias_ctrl(struct snd_soc_codec *codec,
 {
 	if (micbias_num == 1) {
 		if (enable) {
-#if defined(CONFIG_MACH_XIAOMI_LAND) || defined(CONFIG_MACH_XIAOMI_SANTONI)
-			if (xiaomi_series_read() == XIAOMI_SERIES_LANDTONI) {
+#if defined(CONFIG_MACH_XIAOMI_LAND) || defined(CONFIG_MACH_XIAOMI_SANTONI) || defined(CONFIG_MACH_XIAOMI_PRADA)
+			if (xiaomi_series_read() == XIAOMI_SERIES_LANDTONI || xiaomi_device_read() == XIAOMI_DEVICE_PRADA) {
 			snd_soc_update_bits(codec,
 				MSM89XX_PMIC_ANALOG_MICB_1_INT_RBIAS,
 				0x18, 0x18);
@@ -4885,8 +4890,8 @@ static int msm_anlg_cdc_probe(struct platform_device *pdev)
 	}
 #endif
 
-#if defined(CONFIG_MACH_XIAOMI_LAND) || defined(CONFIG_MACH_XIAOMI_SANTONI)
-	if (xiaomi_series_read() == XIAOMI_SERIES_LANDTONI) {
+#if defined(CONFIG_MACH_XIAOMI_LAND) || defined(CONFIG_MACH_XIAOMI_SANTONI) || defined(CONFIG_MACH_XIAOMI_PRADA)
+	if (xiaomi_series_read() == XIAOMI_SERIES_LANDTONI || xiaomi_device_read() == XIAOMI_DEVICE_PRADA) {
 		micbias_default_val = 2700000;
 	}
 #endif
