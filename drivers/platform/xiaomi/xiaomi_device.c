@@ -33,6 +33,8 @@ int xiaomi_device_get(void)
 		ret = XIAOMI_DEVICE_LAND;
 	else if (strcmp(xiaomi_device_str, "santoni") == 0)
 		ret = XIAOMI_DEVICE_SANTONI;
+	else if (strcmp(xiaomi_device_str, "prada") == 0)
+		ret = XIAOMI_DEVICE_PRADA;
 	else
 		ret = XIAOMI_DEVICE_UNKNOWN;
 
