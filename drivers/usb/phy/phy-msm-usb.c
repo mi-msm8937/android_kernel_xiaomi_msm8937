@@ -53,6 +53,11 @@
 #include <linux/msm-bus.h>
 
 #ifdef CONFIG_MACH_XIAOMI
+#include <linux/xiaomi_device.h>
+extern int xiaomi_device_read(void);
+#endif
+
+#ifdef CONFIG_MACH_XIAOMI
 #include <linux/xiaomi_series.h>
 extern int xiaomi_series_read(void);
 #endif
@@ -3971,6 +3976,13 @@ static int msm_otg_probe(struct platform_device *pdev)
 #if defined(CONFIG_MACH_XIAOMI_ROVA) || defined(CONFIG_MACH_XIAOMI_TIARE)
 	if (xiaomi_series_read() == XIAOMI_SERIES_ROVA) {
 		idev_chg_max = 1000;
+		dcp_max_current = idev_chg_max;
+	}
+#endif
+
+#ifdef CONFIG_MACH_XIAOMI_PRADA
+	if (xiaomi_device_read() == XIAOMI_DEVICE_PRADA) {
+		idev_chg_max = 2000;
 		dcp_max_current = idev_chg_max;
 	}
 #endif
