@@ -8,6 +8,13 @@ config MACH_XIAOMI_LAND
 	help
 	  Support for Xiaomi Redmi 3S.
 
+config MACH_XIAOMI_PRADA
+	bool "Xiaomi Redmi 4 Standard"
+	depends on MACH_XIAOMI
+	depends on ARCH_MSM8937
+	help
+	  Support for Xiaomi Redmi 4 Standard.
+
 config MACH_XIAOMI_ROVA
 	bool "Xiaomi Redmi 4A / 5A (Unified)"
 	depends on MACH_XIAOMI
