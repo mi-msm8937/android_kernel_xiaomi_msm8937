@@ -46,6 +46,11 @@
 #include <linux/platform_device.h>
 
 #ifdef CONFIG_MACH_XIAOMI
+#include <linux/xiaomi_device.h>
+extern int xiaomi_device_read(void);
+#endif
+
+#ifdef CONFIG_MACH_XIAOMI
 #include <linux/xiaomi_series.h>
 extern int xiaomi_series_read(void);
 #endif
@@ -645,7 +650,7 @@ static int __init fpc1020_init(void)
 	int rc;
 
 #ifdef CONFIG_MACH_XIAOMI
-	if (xiaomi_series_read() != XIAOMI_SERIES_LANDTONI)
+	if (xiaomi_series_read() != XIAOMI_SERIES_LANDTONI && xiaomi_device_read() != XIAOMI_DEVICE_PRADA)
 		return -ENODEV;
 #endif
 
