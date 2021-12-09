@@ -37,6 +37,10 @@
 extern bool xiaomi_ts_probed;
 #endif
 
+#ifdef CONFIG_TOUCHSCREEN_XIAOMI_DT2W
+#include <linux/input/xiaomi_dt2w.h>
+#endif
+
 static u8 TP_Maker, LCD_Maker, Panel_Ink;
 static u8 Fw_Version[3];
 u8 Panel_ID;
@@ -5223,6 +5227,12 @@ static int mxt_suspend(struct device *dev)
 	struct mxt_data *data = i2c_get_clientdata(client);
 	struct input_dev *input_dev = data->input_dev;
 	int ret;
+#ifdef CONFIG_TOUCHSCREEN_XIAOMI_DT2W
+	const struct mxt_platform_data *pdata = data->pdata;
+	if (!pdata->cut_off_power) {
+		data->wakeup_gesture_mode = xiaomi_dt2w_enable ? MXT_INPUT_EVENT_WAKUP_MODE_ON : 0;
+	}
+#endif
 
 	if (data->pdata->cut_off_power) {
 		cancel_delayed_work_sync(&data->resume_delayed_work);
@@ -6327,6 +6337,12 @@ static void mxt_shutdown(struct i2c_client *client)
 static int mxt_ts_suspend(struct device *dev)
 {
 	struct mxt_data *data =  dev_get_drvdata(dev);
+#ifdef CONFIG_TOUCHSCREEN_XIAOMI_DT2W
+	const struct mxt_platform_data *pdata = data->pdata;
+	if (!pdata->cut_off_power) {
+		data->wakeup_gesture_mode = xiaomi_dt2w_enable ? MXT_INPUT_EVENT_WAKUP_MODE_ON : 0;
+	}
+#endif
 
 	if (device_may_wakeup(dev) &&
 			data->wakeup_gesture_mode) {
