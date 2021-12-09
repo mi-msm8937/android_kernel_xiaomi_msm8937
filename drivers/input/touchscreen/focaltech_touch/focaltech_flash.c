@@ -172,8 +172,10 @@ void fts_ctpm_get_upgrade_array(void)
 	fts_ctpm_i2c_hid2std(fts_i2c_client);
 
 	/* Get functin pointer */
+/*
 	memcpy(&fts_updatefun_curr, &fts_updatefun,
 			sizeof(struct fts_upgrade_fun));
+*/
 
 	FTS_FUNC_EXIT();
 }
