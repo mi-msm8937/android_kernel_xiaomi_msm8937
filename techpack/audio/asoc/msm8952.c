@@ -98,8 +98,14 @@ static int rova_headset_gpio;
 static int rova_spk_pa_gpio;
 #endif
 
-#if defined(CONFIG_MACH_XIAOMI_LAND) || defined(CONFIG_MACH_XIAOMI_SANTONI) || defined(CONFIG_MACH_XIAOMI_PRADA)
+#ifdef CONFIG_MACH_XIAOMI_PRADA
+static int prada_headset_en_gpio;
+static int prada_headset_in_gpio;
+#endif
+#if defined(CONFIG_MACH_XIAOMI_LAND) || defined(CONFIG_MACH_XIAOMI_SANTONI)
 static int landtoni_headset_gpio;
+#endif
+#if defined(CONFIG_MACH_XIAOMI_LAND) || defined(CONFIG_MACH_XIAOMI_SANTONI) || defined(CONFIG_MACH_XIAOMI_PRADA)
 static int landtoni_spk_pa_gpio;
 
 static struct delayed_work landtoni_lineout_amp_enable;
@@ -1120,7 +1126,17 @@ exit:
 static void landtoni_msm8952_ext_hs_control(u32 enable)
 {
 
-	gpio_direction_output(landtoni_headset_gpio, enable);
+#ifdef CONFIG_MACH_XIAOMI_PRADA
+	if (xiaomi_device_read() == XIAOMI_DEVICE_PRADA) {
+		gpio_direction_output(prada_headset_en_gpio, enable);
+		gpio_direction_output(prada_headset_in_gpio, enable);
+	}
+#endif
+#if defined(CONFIG_MACH_XIAOMI_LAND) || defined(CONFIG_MACH_XIAOMI_SANTONI)
+	if (xiaomi_series_read() == XIAOMI_SERIES_LANDTONI) {
+		gpio_direction_output(landtoni_headset_gpio, enable);
+	}
+#endif
 	pr_err("%s: %s [zjm]  headset 111PAs.\n", __func__,
 	  enable ? "Enable" : "Disable");
 }
@@ -1128,7 +1144,17 @@ static void landtoni_msm8952_ext_hs_control(u32 enable)
 static void landtoni_msm8952_ext_hs_delay_enable(struct work_struct *work)
 {
 
-	gpio_direction_output(landtoni_headset_gpio, true);
+#ifdef CONFIG_MACH_XIAOMI_PRADA
+	if (xiaomi_device_read() == XIAOMI_DEVICE_PRADA) {
+		gpio_direction_output(prada_headset_en_gpio, true);
+		gpio_direction_output(prada_headset_in_gpio, true);
+	}
+#endif
+#if defined(CONFIG_MACH_XIAOMI_LAND) || defined(CONFIG_MACH_XIAOMI_SANTONI)
+	if (xiaomi_series_read() == XIAOMI_SERIES_LANDTONI) {
+		gpio_direction_output(landtoni_headset_gpio, true);
+	}
+#endif
 	pr_err("%s:  [zjm]  headset 111PAs.\n", __func__);
 }
 
@@ -1201,7 +1227,17 @@ static void landtoni_msm8x16_ext_spk_delayed_dualmode(struct work_struct *work)
 	int i = 0;
 
 	/* Open the headset device */
-	gpio_direction_output(landtoni_headset_gpio, true);
+#ifdef CONFIG_MACH_XIAOMI_PRADA
+	if (xiaomi_device_read() == XIAOMI_DEVICE_PRADA) {
+		gpio_direction_output(prada_headset_en_gpio, true);
+		gpio_direction_output(prada_headset_in_gpio, true);
+	}
+#endif
+#if defined(CONFIG_MACH_XIAOMI_LAND) || defined(CONFIG_MACH_XIAOMI_SANTONI)
+	if (xiaomi_series_read() == XIAOMI_SERIES_LANDTONI) {
+		gpio_direction_output(landtoni_headset_gpio, true);
+	}
+#endif
 	usleep_range(LANDTONI_EXT_CLASS_D_EN_DELAY,
 		LANDTONI_EXT_CLASS_D_EN_DELAY + LANDTONI_EXT_CLASS_D_DELAY_DELTA);
 
@@ -3882,7 +3918,35 @@ parse_mclk_freq:
 			}
 		}
 		pr_err("%s: [hjf] request landtoni_spk_pa_gpio is %d!\n", __func__, landtoni_spk_pa_gpio);
+	}
+#endif
+#ifdef CONFIG_MACH_XIAOMI_PRADA
+	if (xiaomi_device_read() == XIAOMI_DEVICE_PRADA) {
+		prada_headset_en_gpio = of_get_named_gpio(pdev->dev.of_node, "qcom,msm-switch-headphone-en", 0);
+		if (prada_headset_en_gpio < 0) {
+			dev_err(&pdev->dev,
+			"%s: error! prada_headset_en_gpio is :%d\n", __func__, prada_headset_en_gpio);
+		} else {
+			if (gpio_request_one(prada_headset_en_gpio, GPIOF_DIR_OUT, "prada_headset_en_gpio")) {
+				pr_err("%s: request prada_headset_en_gpio fail!\n", __func__);
+			}
+		}
+		pr_err("%s: [hjf] request prada_headset_en_gpio is %d!\n", __func__, prada_headset_en_gpio);
 
+		prada_headset_in_gpio = of_get_named_gpio(pdev->dev.of_node, "qcom,msm-switch-headphone-in", 0);
+		if (prada_headset_in_gpio < 0) {
+			dev_err(&pdev->dev,
+			"%s: error! prada_headset_in_gpio is :%d\n", __func__, prada_headset_in_gpio);
+		} else {
+			if (gpio_request_one(prada_headset_in_gpio, GPIOF_DIR_OUT, "prada_headset_in_gpio")) {
+				pr_err("%s: request prada_headset_in_gpio fail!\n", __func__);
+			}
+		}
+		pr_err("%s: [hjf] request prada_headset_in_gpio is %d!\n", __func__, prada_headset_in_gpio);
+	}
+#endif
+#if defined(CONFIG_MACH_XIAOMI_LAND) || defined(CONFIG_MACH_XIAOMI_SANTONI)
+	if (xiaomi_series_read() == XIAOMI_SERIES_LANDTONI) {
 		landtoni_headset_gpio = of_get_named_gpio(pdev->dev.of_node, "headset-gpio", 0);
 		if (landtoni_headset_gpio < 0) {
 			dev_err(&pdev->dev,
