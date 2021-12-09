@@ -75,7 +75,7 @@ extern int xiaomi_series_read(void);
 #define N_SPI_MINORS		32
 
 
-struct gf_key_map key_map[] = {
+static struct gf_key_map key_map[] = {
 	{  "POWER",  KEY_POWER  },
 	{  "HOME" ,  KEY_HOME   },
 	{  "MENU" ,  KEY_MENU   },
