@@ -209,6 +209,7 @@ void thaw_fingerprintd(void)
 			(!memcmp(p->comm,"android.hardware.biometrics.fingerprint@2.1-service.xiaomi_landtoni", 13)) ||
 			(!memcmp(p->comm,"android.hardware.biometrics.fingerprint@2.1-service.xiaomi_prada", 13)) ||
 			(!memcmp(p->comm,"android.hardware.biometrics.fingerprint@2.1-service.xiaomi_santoni", 13)) ||
+			(!memcmp(p->comm,"android.hardware.biometrics.fingerprint@2.1-service.xiaomi_ulova", 13)) ||
 			(!memcmp(p->comm,"android.hardware.biometrics.fingerprint@2.1-service.xiaomi_ulysse", 13)) ||
 			(!memcmp(p->comm,"land_gx_fpd", 13)) ||
 			(!memcmp(p->comm,"santoni_gx_fpd", 13)) ||
