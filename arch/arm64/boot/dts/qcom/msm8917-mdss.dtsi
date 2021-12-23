@@ -90,7 +90,7 @@
 };
 
 &mdss_rotator {
-	/delete-property/ qcom,mdss-has-ubwc;
+	/delete-property/ qcom,mdss-highest-bank-bit;
 };
 
 /delete-node/ &mdss_fb2;
