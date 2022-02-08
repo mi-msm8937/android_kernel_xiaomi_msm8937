@@ -129,3 +129,10 @@ out*/*
 
 # ft5435 firmware
 !drivers/input/touchscreen/ft5435/include/firmware/*.i
+
+# AnyKernel 3
+!.ak3_patches/
+!.ak3_patches/*.patch
+!.ak3_patches/device/
+!.ak3_patches/device/*/
+!.ak3_patches/device/*/*.patch
