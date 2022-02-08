@@ -1,0 +1,42 @@
+From 5d946656e2076b434515b9107bb5a2deb2f842d2 Mon Sep 17 00:00:00 2001
+From: me-cafebabe <87921983+me-cafebabe@users.noreply.github.com>
+Date: Tue, 8 Feb 2022 17:00:38 +0800
+Subject: [PATCH 2/2] ak3: mi8937: backup the partition to sdcard before
+ flashing
+
+---
+ .ak3/anykernel.sh | 10 +++++++++-
+ 1 file changed, 9 insertions(+), 1 deletion(-)
+
+diff --git a/.ak3/anykernel.sh b/.ak3/anykernel.sh
+index 0e415f5..bfee997 100755
+--- a/.ak3/anykernel.sh
++++ b/.ak3/anykernel.sh
+@@ -15,8 +15,10 @@ supported.versions=REPLACE_ANDROID_VERSION
+ supported.patchlevels=
+ '; } # end properties
+ 
++PARTITION=REPLACE_PARTITION
++
+ # shell variables
+-block=/dev/block/bootdevice/by-name/boot;
++block=/dev/block/bootdevice/by-name/$PARTITION;
+ is_slot_device=0;
+ ramdisk_compression=auto;
+ patch_vbmeta_flag=0;
+@@ -25,6 +27,12 @@ patch_vbmeta_flag=0;
+ # import patching functions/variables - see for reference
+ . tools/ak3-core.sh;
+ 
++# Backup the partition
++if dd if=${block} of=/sdcard/previous-${PARTITION}.img; then
++  ui_print ""
++  ui_print "Your previous ${PARTITION} image has been saved to: /sdcard/previous-${PARTITION}.img"
++  ui_print ""
++fi
+ 
+ ## AnyKernel file attributes
+ # set permissions/ownership for included ramdisk files
+-- 
+2.33.0
+
