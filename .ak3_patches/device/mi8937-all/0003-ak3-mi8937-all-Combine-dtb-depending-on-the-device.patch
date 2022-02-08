@@ -1,14 +1,14 @@
-From 691168f3d0995c3f17364b4fb9cc6cd7d728f10e Mon Sep 17 00:00:00 2001
+From f8628edee78a8d7ea97b0555569e08d010db7941 Mon Sep 17 00:00:00 2001
 From: me-cafebabe <87921983+me-cafebabe@users.noreply.github.com>
 Date: Tue, 8 Feb 2022 23:55:47 +0800
-Subject: [PATCH 3/3] ak3: mi8937-all: Combine dtb depending on the device
+Subject: [PATCH 3/4] ak3: mi8937-all: Combine dtb depending on the device
 
 ---
  .ak3/tools/ak3-core.sh | 46 ++++++++++++++++++++++++++++++++++++------
  1 file changed, 40 insertions(+), 6 deletions(-)
 
 diff --git a/.ak3/tools/ak3-core.sh b/.ak3/tools/ak3-core.sh
-index fe77722..74de60f 100755
+index fb31921..18a05da 100755
 --- a/.ak3/tools/ak3-core.sh
 +++ b/.ak3/tools/ak3-core.sh
 @@ -253,12 +253,46 @@ flash_boot() {

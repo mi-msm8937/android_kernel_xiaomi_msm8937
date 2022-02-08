@@ -1,0 +1,28 @@
+From 40d1c4b10815844fa1ac34bc6dba15490b9416c6 Mon Sep 17 00:00:00 2001
+From: me-cafebabe <87921983+me-cafebabe@users.noreply.github.com>
+Date: Wed, 9 Feb 2022 02:10:08 +0800
+Subject: [PATCH 3/3] ak3: mi8937: Temporarily workaround patch_cmdline
+
+This implementation supports only adding tho
+---
+ .ak3/tools/ak3-core.sh | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/.ak3/tools/ak3-core.sh b/.ak3/tools/ak3-core.sh
+index fe77722..fb31921 100755
+--- a/.ak3/tools/ak3-core.sh
++++ b/.ak3/tools/ak3-core.sh
+@@ -632,6 +632,10 @@ patch_fstab() {
+ 
+ # patch_cmdline <cmdline entry name> <replacement string>
+ patch_cmdline() {
++  if ! grep -E "^cmdline=" $split_img/header|grep "$1" > /dev/null; then
++    /sbin/sed -i "s|cmdline=|cmdline=${2} |g" $split_img/header
++  fi
++  return 0;
+   local cmdfile cmdtmp match;
+   if [ -f "$split_img/cmdline.txt" ]; then
+     cmdfile=$split_img/cmdline.txt;
+-- 
+2.33.0
+
