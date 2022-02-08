@@ -1,0 +1,27 @@
+From 67e00b816e4652fce53d17e0743512c44f79afd3 Mon Sep 17 00:00:00 2001
+From: me-cafebabe <87921983+me-cafebabe@users.noreply.github.com>
+Date: Wed, 9 Feb 2022 02:16:16 +0800
+Subject: [PATCH 4/4] ak3: mi8937-all: Disable PRLMK kill_heaviest_gid on tiare
+
+---
+ .ak3/anykernel.sh | 5 +++++
+ 1 file changed, 5 insertions(+)
+
+diff --git a/.ak3/anykernel.sh b/.ak3/anykernel.sh
+index 3d4fff2..5875a5b 100755
+--- a/.ak3/anykernel.sh
++++ b/.ak3/anykernel.sh
+@@ -57,5 +57,10 @@ dump_boot;
+ # Enable USB ConfigFS
+ patch_cmdline androidboot.usbconfigfs androidboot.usbconfigfs=true
+ 
++# Disable PRLMK kill_heaviest_gid on tiare
++if ! [ -z "$(cat /proc/cmdline|grep S88508)" ]; then
++	patch_cmdline prlmk.kill_heaviest_gid prlmk.kill_heaviest_gid=0
++fi
++
+ write_boot;
+ ## end boot install
+-- 
+2.33.0
+
