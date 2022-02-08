@@ -1,0 +1,24 @@
+From 442e244987c54e6f7d638bb1c8a32357984032f0 Mon Sep 17 00:00:00 2001
+From: me-cafebabe <87921983+me-cafebabe@users.noreply.github.com>
+Date: Tue, 8 Feb 2022 23:34:54 +0800
+Subject: [PATCH 2/3] ak3: mi8937-all: Add tiare to device list
+
+---
+ .ak3/anykernel.sh | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/.ak3/anykernel.sh b/.ak3/anykernel.sh
+index 6706ad0..3d4fff2 100755
+--- a/.ak3/anykernel.sh
++++ b/.ak3/anykernel.sh
+@@ -21,6 +21,7 @@ device.name8=ugg
+ device.name9=ugglite
+ device.name10=ulysse
+ device.name11=prada
++device.name12=tiare
+ supported.versions=REPLACE_ANDROID_VERSION
+ supported.patchlevels=
+ '; } # end properties
+-- 
+2.33.0
+
