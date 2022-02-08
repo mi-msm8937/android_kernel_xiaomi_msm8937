@@ -255,6 +255,7 @@ source $OUT/.config
 if ! [ -z "$VARIANT_NAME" ]; then
     sed -i "s|CONFIG_LOCALVERSION=\"${CONFIG_LOCALVERSION}\"|CONFIG_LOCALVERSION=\"${CONFIG_LOCALVERSION}-${VARIANT_NAME}\"|g" $OUT/.config
 fi
+echo >> $OUT/.config
 echo "# Appended by build script" >> $OUT/.config
 if [ "$LTO" == "true" ]; then
     func_set_defconfig $OUT/.config CONFIG_LTO_CLANG y
