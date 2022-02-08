@@ -136,3 +136,6 @@ out*/*
 !.ak3_patches/device/
 !.ak3_patches/device/*/
 !.ak3_patches/device/*/*.patch
+
+# Hidden files in ARM64 config dir
+!arch/arm64/configs/.*
