@@ -246,7 +246,11 @@ if [ "$PARTITION" == "recovery" ]; then
     git commit -m "Workaround flashlight issue in recovery mode"
 fi
 
-cp arch/arm64/configs/${DEVICE}_defconfig $OUT/.config
+if [ "$DEVICE" == "mi8937-all" ]; then
+    cat arch/arm64/configs/mi8937_defconfig arch/arm64/configs/.mi8937_defconfig_extra >> $OUT/.config
+else
+    cp arch/arm64/configs/${DEVICE}_defconfig $OUT/.config
+fi
 source $OUT/.config
 if ! [ -z "$VARIANT_NAME" ]; then
     sed -i "s|CONFIG_LOCALVERSION=\"${CONFIG_LOCALVERSION}\"|CONFIG_LOCALVERSION=\"${CONFIG_LOCALVERSION}-${VARIANT_NAME}\"|g" $OUT/.config
@@ -296,7 +300,13 @@ git commit -m "Final changes of build on $(date)" || true
 FINAL_GIT_HEAD_SHORT="$(git rev-parse --short HEAD)"
 
 cd $OUT/pack
-mv ../arch/arm64/boot/Image.gz-dtb Image.gz-dtb
+if [ "$DEVICE" == "mi8937-all" ]; then
+    mkdir dtbs
+    mv ../arch/arm64/boot/dts/qcom/*.dtb dtbs/
+    mv ../arch/arm64/boot/Image.gz Image.gz
+else
+    mv ../arch/arm64/boot/Image.gz-dtb Image.gz-dtb
+fi
 cp ../.config kernel-config.txt
 ARTIFACT_NAME="${LOCALVERSION}-Kernel-${KERNEL_VERSION}-${BUILD_DATE_SHORT}-${FINAL_GIT_HEAD_SHORT}.zip"
 zip -r9 "../$ARTIFACT_NAME" * -x .git README.md *placeholder *.zip
