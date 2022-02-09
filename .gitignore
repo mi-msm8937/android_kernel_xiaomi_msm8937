@@ -133,9 +133,6 @@ out*/*
 # AnyKernel 3
 !.ak3_patches/
 !.ak3_patches/*.patch
-!.ak3_patches/device/
-!.ak3_patches/device/*/
-!.ak3_patches/device/*/*.patch
 
 # Hidden files in ARM64 config dir
 !arch/arm64/configs/.*

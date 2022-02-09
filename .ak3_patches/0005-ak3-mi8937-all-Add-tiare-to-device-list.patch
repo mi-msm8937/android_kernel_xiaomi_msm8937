@@ -1,7 +1,7 @@
 From fe27c4e1b9147b6ce1e1fe46ed37f6f02f8b50f1 Mon Sep 17 00:00:00 2001
 From: me-cafebabe <87921983+me-cafebabe@users.noreply.github.com>
 Date: Tue, 8 Feb 2022 23:34:54 +0800
-Subject: [PATCH 2/4] ak3: mi8937-all: Add tiare to device list
+Subject: [PATCH 5/7] ak3: mi8937-all: Add tiare to device list
 
 ---
  .ak3/anykernel.sh | 1 +
