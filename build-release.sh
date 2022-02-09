@@ -22,13 +22,12 @@ if ! [ -d ".git" ] || ! [ -d ".ak3" ];then
 fi
 
 func_help() {
-    echo "Build script of Mi8937 Kernel"
+    echo "Build script of Mi8937 All-In-One Kernel"
     echo
     echo "Parameters or Environment variables:"
     echo " Required:"
-    echo "  --device | DEVICE"
-    echo "  --out | OUT"
     echo "  --llvm-path | LLVM_PATH"
+    echo "  --out | OUT"
     echo
     echo " Optional:"
     echo "  --artifact-copy | ARTIFACT_COPY"
@@ -69,12 +68,6 @@ fi
 while [ "${#}" -gt 0 ]; do
     case "${1}" in
         # Required
-        --device )
-            func_validate_parameter_value "${1}" "${2}"
-            DEVICE="${2}"
-            shift
-            shift
-            ;;
         --out )
             func_validate_parameter_value "${1}" "${2}"
             OUT="${2}"
@@ -147,14 +140,6 @@ if ! [ "$(git branch --list $BRANCH_MAIN)" ]; then
     exit 1
 fi
 
-case "$DEVICE" in
-    "mi8937"|"mi8937-all"|"riva"|"tiare")
-        ;;
-    *)
-        echo "Unsupported device: $DEVICE"
-        exit 1
-        ;;
-esac
 if [ -z "$OUT" ]; then
     echo "Please specify out directory."
     exit 1
@@ -246,11 +231,8 @@ if [ "$PARTITION" == "recovery" ]; then
     git commit -m "Workaround flashlight issue in recovery mode"
 fi
 
-if [ "$DEVICE" == "mi8937-all" ]; then
-    cat arch/arm64/configs/mi8937_defconfig arch/arm64/configs/.mi8937_defconfig_extra >> $OUT/.config
-else
-    cp arch/arm64/configs/${DEVICE}_defconfig $OUT/.config
-fi
+cat arch/arm64/configs/mi8937_defconfig arch/arm64/configs/.mi8937_defconfig_extra >> $OUT/.config
+
 source $OUT/.config
 if ! [ -z "$VARIANT_NAME" ]; then
     sed -i "s|CONFIG_LOCALVERSION=\"${CONFIG_LOCALVERSION}\"|CONFIG_LOCALVERSION=\"${CONFIG_LOCALVERSION}-${VARIANT_NAME}\"|g" $OUT/.config
@@ -282,11 +264,7 @@ fi
 if [ -d ".ak3_patches" ] && ! [ -z "$(ls .ak3_patches/*.patch)" ]; then
     git am .ak3_patches/*.patch
 fi
-if [ -d ".ak3_patches/device/${DEVICE}" ] && ! [ -z "$(ls .ak3_patches/device/${DEVICE}/*.patch)" ]; then
-    git am .ak3_patches/device/${DEVICE}/*.patch
-fi
 sed -i "s|REPLACE_KERNEL_STRING|${LOCALVERSION} Kernel ${KERNEL_VERSION}|g" .ak3/anykernel.sh
-sed -i "s|REPLACE_DEVICE_NAME|${DEVICE}|g" .ak3/anykernel.sh
 sed -i "s|REPLACE_PARTITION|${PARTITION}|g" .ak3/anykernel.sh
 if [ "$PARTITION" == "boot" ]; then
     sed -i "s|REPLACE_ANDROID_VERSION|${SUPPORTED_ANDROID_VERSIONS}|g" .ak3/anykernel.sh
@@ -301,13 +279,9 @@ git commit -m "Final changes of build on $(date)" || true
 FINAL_GIT_HEAD_SHORT="$(git rev-parse --short HEAD)"
 
 cd $OUT/pack
-if [ "$DEVICE" == "mi8937-all" ]; then
-    mkdir dtbs
-    mv ../arch/arm64/boot/dts/qcom/*.dtb dtbs/
-    mv ../arch/arm64/boot/Image.gz Image.gz
-else
-    mv ../arch/arm64/boot/Image.gz-dtb Image.gz-dtb
-fi
+mkdir dtbs
+mv ../arch/arm64/boot/dts/qcom/*.dtb dtbs/
+mv ../arch/arm64/boot/Image.gz Image.gz
 cp ../.config kernel-config.txt
 ARTIFACT_NAME="${LOCALVERSION}-Kernel-${KERNEL_VERSION}-${BUILD_DATE_SHORT}-${FINAL_GIT_HEAD_SHORT}.zip"
 zip -r9 "../$ARTIFACT_NAME" * -x .git README.md *placeholder *.zip
