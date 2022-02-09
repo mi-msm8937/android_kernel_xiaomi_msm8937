@@ -1,7 +1,7 @@
 From 40d1c4b10815844fa1ac34bc6dba15490b9416c6 Mon Sep 17 00:00:00 2001
 From: me-cafebabe <87921983+me-cafebabe@users.noreply.github.com>
 Date: Wed, 9 Feb 2022 02:10:08 +0800
-Subject: [PATCH 3/7] ak3: mi8937: Temporarily workaround patch_cmdline
+Subject: [PATCH 3/8] ak3: mi8937: Temporarily workaround patch_cmdline
 
 This implementation supports only adding tho
 ---

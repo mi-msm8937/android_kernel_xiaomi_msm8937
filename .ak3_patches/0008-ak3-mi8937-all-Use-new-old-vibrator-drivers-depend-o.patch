@@ -1,0 +1,45 @@
+From e8d0a8cf4dc60936ff734c5b6bdcb83c1289bcf1 Mon Sep 17 00:00:00 2001
+From: me-cafebabe <87921983+me-cafebabe@users.noreply.github.com>
+Date: Wed, 9 Feb 2022 15:15:43 +0800
+Subject: [PATCH 8/8] ak3: mi8937-all: Use new/old vibrator drivers depend on
+ if QTI Vib AIDL exists
+
+---
+ .ak3/tools/ak3-core.sh | 21 ++++++++++++++++++++-
+ 1 file changed, 20 insertions(+), 1 deletion(-)
+
+diff --git a/.ak3/tools/ak3-core.sh b/.ak3/tools/ak3-core.sh
+index 18a05da..afd7fed 100755
+--- a/.ak3/tools/ak3-core.sh
++++ b/.ak3/tools/ak3-core.sh
+@@ -291,7 +291,26 @@ flash_boot() {
+       abort "Fatal Error: Unable to determine device from devicetree!"
+       ;;
+   esac
+-  cat Image.gz dtbs/$DTB_FILE > Image.gz-dtb
++  if [ "$PARTITION" == "boot" ]; then
++    if [ -e "/vendor/etc/vintf/manifest/vendor.qti.hardware.vibrator.service.xml" ]; then
++      DTB_DIR=dtbs-newvib
++      ui_print "Detected QTI Vibrator AIDL, Use new vibrator drivers."
++    else
++      DTB_DIR=dtbs-oldvib
++      ui_print "Not detected QTI Vibrator AIDL, Use old vibrator drivers."
++    fi
++    ui_print "****************************"
++    ui_print " Note: Wrong vibrator driver"
++    ui_print "  might prevent the ROM to"
++    ui_print "  to boot."
++    ui_print ""
++    ui_print "  !Just flash the backup!"
++    ui_print "  ! if it does not boot !"
++    ui_print "****************************"
++  else
++    DTB_DIR=dtbs-oldvib
++  fi
++  cat Image.gz $DTB_DIR/$DTB_FILE > Image.gz-dtb
+   kernel=$home/Image.gz-dtb
+   if [ "$kernel" ]; then
+     if [ -f "$bin/mkmtkhdr" -a -f "$split_img/boot.img-base" ]; then
+-- 
+2.33.0
+
