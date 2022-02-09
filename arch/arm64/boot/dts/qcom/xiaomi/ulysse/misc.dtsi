@@ -18,13 +18,11 @@
 		ant_check_gpio = <&tlmm 46 0x0>;
 	};
 
-	gpio-vib {
-		compatible = "gpio-vibrator";
-		vibrator {
-			gpios = <&tlmm 9 0>;
-			label = "vibrator";
-			max_timeout = <15000>;
-		};
+	vibrator_gpio {
+		compatible = "qcom,vibrator-gpio";
+		qcom,vibrator-timeout-ms = <15000>;
+		qcom,vib-gpio_one = <&tlmm 9 0x00>;
+		label = "vibrator";
 	};
 
 	pwm_ir {
