@@ -73,13 +73,8 @@
 };
 
 &pmi_haptic {
+	qcom,actuator-type = <1>;
 	qcom,ilim-ma = < 0x5f >;
 	qcom,vmax-mv = < 0xaf0 >;
-	qcom,play-rate-us = < 0x148f >;
-	wf_0 { qcom,wf-vmax-mv = <0xaf0>; };
-	wf_1 { qcom,wf-vmax-mv = <0xaf0>; };
-	wf_2 { qcom,wf-vmax-mv = <0xaf0>; };
-	wf_3 { qcom,wf-vmax-mv = <0xaf0>; };
-	wf_4 { qcom,wf-vmax-mv = <0xaf0>; };
-	wf_5 { qcom,wf-vmax-mv = <0xaf0>; };
+	qcom,wave-play-rate-us = < 0x148f >;
 };
