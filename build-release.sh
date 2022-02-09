@@ -8,8 +8,6 @@ BRANCH_COMMITS="reference"
 BRANCH_MAIN="a12/master"
 BUILD_FLAGS="-j$(nproc) LLVM=1"
 COMMITMSG_LEGACY_OMX="This reverts commit e265d46203a6a01abb9824933dee5641f4aff428"
-COMMITMSG_LEGACY_VIB_GPIO="Squashed Revert of LED GPIO vibrator driver"
-COMMITMSG_LEGACY_VIB_QPNP="Squashed Revert of QTI Haptics commits"
 SUPPORTED_ANDROID_VERSIONS="8.1.0 - 12"
 
 if ! git --version > /dev/null; then
@@ -34,7 +32,6 @@ func_help() {
     echo "  --artifact-upload | ARTIFACT_UPLOAD"
     echo "  --cherry-pick | CHERRY_PICK"
     echo "  --legacy-omx | LEGACY_OMX"
-    echo "  --legacy-vib | LEGACY_VIB"
     echo "  --lto | LTO"
     echo "  --partition | PARTITION"
 }
@@ -101,10 +98,6 @@ while [ "${#}" -gt 0 ]; do
             ;;
         --legacy-omx )
             LEGACY_OMX="true"
-            shift
-            ;;
-        --legacy-vib )
-            LEGACY_VIB="true"
             shift
             ;;
         --lto )
@@ -184,7 +177,6 @@ case "$PARTITION" in
     "boot")
         ;;
     "recovery")
-        LEGACY_VIB="true"
         ;;
     "")
         PARTITION="boot"
@@ -199,12 +191,8 @@ if ! [ -z "$CHERRY_PICK" ]; then
     VARIANT_NAME="TEST"
 elif [ "$PARTITION" == "recovery" ]; then
     VARIANT_NAME="Recovery"
-elif [ "$LEGACY_OMX" == "true" ] && [ "$LEGACY_VIB" == "true" ]; then
-    VARIANT_NAME="LegacyOMXVib"
 elif [ "$LEGACY_OMX" == "true" ]; then
     VARIANT_NAME="LegacyOMX"
-elif [ "$LEGACY_VIB" == "true" ]; then
-    VARIANT_NAME="LegacyVibrator"
 fi
 
 git stash save -a "$(date +backup_%Y%m%d-%H%M%S)" || true
@@ -219,10 +207,6 @@ if ! [ -z "$CHERRY_PICK" ]; then
 fi
 if [ "$LEGACY_OMX" == "true" ]; then
     git cherry-pick $(func_get_commitid_by_msg "$COMMITMSG_LEGACY_OMX")
-fi
-if [ "$LEGACY_VIB" == "true" ]; then
-    git cherry-pick $(func_get_commitid_by_msg "$COMMITMSG_LEGACY_VIB_GPIO")
-    git cherry-pick $(func_get_commitid_by_msg "$COMMITMSG_LEGACY_VIB_QPNP")
 fi
 
 if [ "$PARTITION" == "recovery" ]; then
