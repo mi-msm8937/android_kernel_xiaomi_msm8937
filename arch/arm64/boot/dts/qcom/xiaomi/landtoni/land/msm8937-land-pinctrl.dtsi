@@ -11,4 +11,5 @@
 
 &pmi_haptic {
 	qcom,vmax-mv = <2700>;
+	qcom,actuator-type = <1>;
 };
