@@ -296,12 +296,15 @@ if [ -f "$ARTIFACT_NAME" ]; then
     fi
     case "$ARTIFACT_UPLOAD" in
         "oshi.at")
-            curl --upload-file $ARTIFACT_NAME https://oshi.at/${ARTIFACT_NAME} | tee upload-oshi_at.txt
+            curl --upload-file $ARTIFACT_NAME https://oshi.at/${ARTIFACT_NAME} | tee upload.txt
             ;;
         "transfer.sh")
-            curl --upload-file $ARTIFACT_NAME https://transfer.sh/${ARTIFACT_NAME} | tee upload-transfer_sh.txt
+            curl --upload-file $ARTIFACT_NAME https://transfer.sh/${ARTIFACT_NAME} | tee upload.txt
             ;;
     esac
+    if [ -f "upload.txt" ] && [ -d "$ARTIFACT_COPY" ]; then
+        cp upload.txt ${ARTIFACT_COPY}/
+    fi
 fi
 
 exit 0
