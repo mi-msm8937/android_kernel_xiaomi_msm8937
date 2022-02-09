@@ -8,6 +8,7 @@ BRANCH_COMMITS="reference"
 BRANCH_MAIN="a12/master"
 BUILD_FLAGS="-j$(nproc) LLVM=1"
 COMMITMSG_LEGACY_OMX="This reverts commit e265d46203a6a01abb9824933dee5641f4aff428"
+COMMITMSG_OLD_VIB_DTS="ARM64: dts: Bring back old vibrator nodes"
 SUPPORTED_ANDROID_VERSIONS="8.1.0 - 12"
 
 if ! git --version > /dev/null; then
@@ -208,6 +209,13 @@ fi
 if [ "$LEGACY_OMX" == "true" ]; then
     git cherry-pick $(func_get_commitid_by_msg "$COMMITMSG_LEGACY_OMX")
 fi
+if grep "qcom,qpnp-haptics" arch/arm64/boot/dts/qcom/pmi8950.dtsi>/dev/null; then
+    if [ "$PARTITION" == "boot" ]; then
+        git revert $(func_get_commitid_by_msg "$COMMITMSG_OLD_VIB_DTS") --no-edit
+    fi
+else
+    git cherry-pick $(func_get_commitid_by_msg "$COMMITMSG_OLD_VIB_DTS")
+fi
 
 if [ "$PARTITION" == "recovery" ]; then
     sed -i 's|max_brightness = LED_FULL|max_brightness = 1|g' drivers/leds/leds-msm-back-gpio-flash-ulysse.c
@@ -240,6 +248,12 @@ BUILD_DATE_SHORT="$(TZ=UTC date +%Y%m%d)"
 KERNEL_VERSION="$(grep 'Kernel Configuration' $OUT/.config | cut -d ' ' -f 3)"
 LOCALVERSION="$(echo -n $CONFIG_LOCALVERSION|cut -c 2-)"
 
+mv $OUT/arch/arm64/boot/dts/ $OUT/arch/arm64/boot/dts-orig/
+if [ "$PARTITION" == "boot" ]; then
+    git cherry-pick $(func_get_commitid_by_msg "$COMMITMSG_OLD_VIB_DTS")
+    make O=$OUT $BUILD_FLAGS dtbs
+fi
+
 if ! [ -f "$OUT/arch/arm64/boot/Image.gz" ] || ! [ -f "$OUT/arch/arm64/boot/Image.gz-dtb" ]; then
     echo "Kernel binary has not generated"
     exit 1
@@ -263,8 +277,13 @@ git commit -m "Final changes of build on $(date)" || true
 FINAL_GIT_HEAD_SHORT="$(git rev-parse --short HEAD)"
 
 cd $OUT/pack
-mkdir dtbs
-mv ../arch/arm64/boot/dts/qcom/*.dtb dtbs/
+mkdir dtbs-newvib dtbs-oldvib
+if [ "$PARTITION" == "boot" ]; then
+    mv ../arch/arm64/boot/dts-orig/qcom/*.dtb dtbs-newvib/
+    mv ../arch/arm64/boot/dts/qcom/*.dtb dtbs-oldvib/
+else
+    mv ../arch/arm64/boot/dts-orig/qcom/*.dtb dtbs-oldvib/
+fi
 mv ../arch/arm64/boot/Image.gz Image.gz
 cp ../.config kernel-config.txt
 ARTIFACT_NAME="${LOCALVERSION}-Kernel-${KERNEL_VERSION}-${BUILD_DATE_SHORT}-${FINAL_GIT_HEAD_SHORT}.zip"
