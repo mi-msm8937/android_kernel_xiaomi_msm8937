@@ -309,18 +309,18 @@ cd ../
 
 if [ -f "$ARTIFACT_NAME" ]; then
     if [ -d "$ARTIFACT_COPY" ]; then
-        cp $ARTIFACT_NAME ${ARTIFACT_COPY}/
+        cp "$ARTIFACT_NAME" "${ARTIFACT_COPY}/"
     fi
     case "$ARTIFACT_UPLOAD" in
         "oshi.at")
-            curl --upload-file $ARTIFACT_NAME https://oshi.at/${ARTIFACT_NAME} | tee upload.txt
+            curl --upload-file "$ARTIFACT_NAME" "https://oshi.at/${ARTIFACT_NAME}" | tee upload.txt
             ;;
         "transfer.sh")
-            curl --upload-file $ARTIFACT_NAME https://transfer.sh/${ARTIFACT_NAME} | tee upload.txt
+            curl --upload-file "$ARTIFACT_NAME" "https://transfer.sh/${ARTIFACT_NAME}" | tee upload.txt
             ;;
     esac
     if [ -f "upload.txt" ] && [ -d "$ARTIFACT_COPY" ]; then
-        cp upload.txt ${ARTIFACT_COPY}/
+        cp "upload.txt" "${ARTIFACT_COPY}/"
     fi
 fi
 
