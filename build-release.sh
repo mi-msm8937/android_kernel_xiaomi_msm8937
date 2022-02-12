@@ -31,6 +31,7 @@ func_help() {
     echo " Optional:"
     echo "  --artifact-copy | ARTIFACT_COPY"
     echo "  --artifact-upload | ARTIFACT_UPLOAD"
+    echo "  --branch | BRANCH"
     echo "  --cherry-pick | CHERRY_PICK"
     echo "  --legacy-omx | LEGACY_OMX"
     echo "  --lto | LTO"
@@ -88,6 +89,12 @@ while [ "${#}" -gt 0 ]; do
         --artifact-upload )
             func_validate_parameter_value "${1}" "${2}"
             ARTIFACT_UPLOAD="${2}"
+            shift
+            shift
+            ;;
+        --branch )
+            func_validate_parameter_value "${1}" "${2}"
+            BRANCH="${2}"
             shift
             shift
             ;;
@@ -168,6 +175,10 @@ case "$ARTIFACT_UPLOAD" in
         exit 1
         ;;
 esac
+if ! [ -z "$BRANCH" ] && ! [ "$(git branch --list $BRANCH)" ]; then
+    echo "Error: Specified branch $BRANCH does not exist."
+    exit 1
+fi
 if ! [ -z "$CHERRY_PICK" ]; then
     if ! echo -n "$CHERRY_PICK"|grep -E "^[a-z0-9| ]+$" > /dev/null; then
         echo "Invalid commit ids to cherry-pick: $CHERRY_PICK"
@@ -197,7 +208,11 @@ elif [ "$LEGACY_OMX" == "true" ]; then
 fi
 
 git stash save -a "$(date +backup_%Y%m%d-%H%M%S)" || true
-git checkout $BRANCH_MAIN
+if ! [ -z "$BRANCH" ]; then
+    git checkout $BRANCH
+else
+    git checkout $BRANCH_MAIN
+fi
 git checkout $(git rev-parse --short HEAD)
 
 if ! [ -z "$CHERRY_PICK" ]; then
