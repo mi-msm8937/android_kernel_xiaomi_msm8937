@@ -214,7 +214,9 @@ if grep "qcom,qpnp-haptics" arch/arm64/boot/dts/qcom/pmi8950.dtsi>/dev/null; the
         git revert $(func_get_commitid_by_msg "$COMMITMSG_OLD_VIB_DTS") --no-edit
     fi
 else
-    git cherry-pick $(func_get_commitid_by_msg "$COMMITMSG_OLD_VIB_DTS")
+    if [ "$PARTITION" != "boot" ]; then
+        git cherry-pick $(func_get_commitid_by_msg "$COMMITMSG_OLD_VIB_DTS")
+    fi
 fi
 
 if [ "$PARTITION" == "recovery" ]; then
