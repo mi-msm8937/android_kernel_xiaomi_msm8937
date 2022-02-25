@@ -205,6 +205,8 @@ elif [ "$PARTITION" == "recovery" ]; then
     VARIANT_NAME="Recovery"
 elif [ "$LEGACY_OMX" == "true" ]; then
     VARIANT_NAME="LegacyOMX"
+else
+    VARIANT_NAME=""
 fi
 
 git stash save -a "$(date +backup_%Y%m%d-%H%M%S)" || true
