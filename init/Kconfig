@@ -1572,6 +1572,11 @@ endchoice
 config GCC_GRAPHITE
 	bool "Enable GCC Polyhedral Loop Optimization (Graphite)"
 
+config LTO
+	bool "Enable Link Time Optimization"
+	default n
+	select THIN_ARCHIVES
+
 config SYSCTL
 	bool
 

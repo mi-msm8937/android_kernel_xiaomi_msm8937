@@ -688,6 +688,18 @@ LDFLAGS		+= --plugin-opt=O3
 export LLVM_AR LLVM_DIS
 endif
 
+ifdef CONFIG_LTO
+LTO_CFLAGS    := -flto -flto=jobserver -ffat-lto-objects \
+                 -fuse-linker-plugin -fwhole-program
+KBUILD_CFLAGS += $(LTO_CFLAGS)
+LTO_LDFLAGS   := $(LTO_CFLAGS) -Wno-lto-type-mismatch -Wno-psabi
+LDFINAL       := $(CONFIG_SHELL) $(srctree)/scripts/gcc-ld $(LTO_LDFLAGS)
+AR            := $(CROSS_COMPILE)gcc-ar
+NM            := $(CROSS_COMPILE)gcc-nm
+DISABLE_LTO   := -fno-lto
+export DISABLE_LTO LDFINAL
+endif
+
 ifdef CONFIG_GCC_GRAPHITE
 KBUILD_CFLAGS	+= -fgraphite-identity -floop-nest-optimize
 endif
