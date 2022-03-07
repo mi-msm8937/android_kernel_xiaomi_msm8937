@@ -757,7 +757,10 @@ static void posix_cpu_timer_get(struct k_itimer *timer, struct itimerspec *itp)
 	 * Sample the clock to take the difference with the expiry time.
 	 */
 	if (CPUCLOCK_PERTHREAD(timer->it_clock)) {
-		cpu_clock_sample(timer->it_clock, p, &now);
+		if (unlikely(cpu_clock_sample(timer->it_clock, p, &now))) {
+			timer->it.cpu.expires = 0;
+			goto out;
+		}
 	} else {
 		struct sighand_struct *sighand;
 		unsigned long flags;
