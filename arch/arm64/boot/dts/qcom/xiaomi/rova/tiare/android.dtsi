@@ -1,14 +1,8 @@
 &firmware {
 	android {
 		fstab {
-			system {
-				type = "squashfs";
-				fsmgr_flags = "wait";
-			};
 			vendor {
 				dev = "/dev/block/platform/soc/7824900.sdhci/by-name/vendor";
-				type = "squashfs";
-				fsmgr_flags = "wait";
 			};
 		};
 	};
