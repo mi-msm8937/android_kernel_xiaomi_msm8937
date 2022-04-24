@@ -41,6 +41,7 @@
 #include <linux/debugfs.h>
 #include <linux/alarmtimer.h>
 #include <linux/qpnp/qpnp-adc.h>
+#include <linux/math64.h>
 #include "bqfs_cmd_type.h"
 
 #ifdef CONFIG_MACH_XIAOMI
@@ -1042,7 +1043,7 @@ static int riva_fg_get_battid_resister(struct bq_fg_chip *bq)
 		return RIVA_DEFAULT_RESISTER;
 	}
 
-	bq_battid_resister = (results.physical)*100/(1800000 - results.physical);
+	bq_battid_resister = div_s64((results.physical)*100,(1800000 - results.physical));
 
 	return bq_battid_resister;
 }

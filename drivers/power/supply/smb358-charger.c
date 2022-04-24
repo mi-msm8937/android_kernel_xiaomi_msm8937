@@ -29,6 +29,7 @@
 #include <linux/mutex.h>
 #include <linux/qpnp/qpnp-adc.h>
 #include <linux/extcon.h>
+#include <linux/math64.h>
 
 #define _SMB358_MASK(BITS, POS) \
 	((unsigned char)(((1 << (BITS)) - 1) << (POS)))
@@ -1047,7 +1048,7 @@ int smb358_get_prop_battid_resister(struct smb358_charger *chip)
 		pr_debug("Unable to read batt resister rc=%d\n", rc);
 		return DEFAULT_RESISTER;
 	}
-	battid_resister = (results.physical)*68/(1800000 - results.physical);
+	battid_resister = div_s64((results.physical)*68, (1800000 - results.physical));
 	pr_err("battid_resister = %d\n", battid_resister);
 
 	return battid_resister;

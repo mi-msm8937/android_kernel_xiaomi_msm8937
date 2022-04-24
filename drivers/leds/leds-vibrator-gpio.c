@@ -25,6 +25,7 @@
 #include <linux/err.h>
 #include <linux/gpio.h>
 #include <linux/of_gpio.h>
+#include <linux/math64.h>
 
 struct vibrator_gpio_data {
 	struct	platform_device *dev;
@@ -90,7 +91,7 @@ static ssize_t vibrator_gpio_show_duration(struct device *dev,
 	if (hrtimer_active(&pdata->vib_timer)) {
 		time_rem = hrtimer_get_remaining(&pdata->vib_timer);
 		time_us = ktime_to_us(time_rem);
-		return snprintf(buf, PAGE_SIZE, "%lld\n", time_us / 1000);
+		return snprintf(buf, PAGE_SIZE, "%lld\n", div_s64(time_us, 1000));
 	} else
 		return 0;
 }
