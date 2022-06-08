@@ -72,6 +72,14 @@
 	qcom,en-cabc;
 };
 
+&pm8937_vadc {
+	/delete-node/ chan@11;
+};
+
+&thermal_zones {
+	/delete-node/ pa-therm1-adc;
+};
+
 &pmi_haptic {
 	qcom,ilim-ma = < 0x5f >;
 	qcom,vmax-mv = < 0xaf0 >;
