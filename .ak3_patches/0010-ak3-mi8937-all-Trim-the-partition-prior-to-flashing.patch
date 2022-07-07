@@ -1,0 +1,24 @@
+From 2ebeadca28043ddac36be3812910d4a545881480 Mon Sep 17 00:00:00 2001
+From: me-cafebabe <me_cafebabe@hotmail.com>
+Date: Fri, 8 Jul 2022 05:59:21 +0800
+Subject: [PATCH] ak3: mi8937-all: Trim the partition prior to flashing
+
+---
+ .ak3/anykernel.sh | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/.ak3/anykernel.sh b/.ak3/anykernel.sh
+index 305222919121..f17148863813 100755
+--- a/.ak3/anykernel.sh
++++ b/.ak3/anykernel.sh
+@@ -80,5 +80,7 @@ if [ "$lk2nd" == "1" ]; then
+   dd if=/dev/zero of=$block bs=1 count=$lk2nd_gaps seek=$lk2nd_end
+ fi
+ 
++toybox blkdiscard $block
++
+ write_boot;
+ ## end boot install
+-- 
+2.30.2
+
