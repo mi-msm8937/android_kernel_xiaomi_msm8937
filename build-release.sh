@@ -37,6 +37,7 @@ func_help() {
     echo "  --legacy-omx | LEGACY_OMX"
     echo "  --lto | LTO"
     echo "  --partition | PARTITION"
+    echo "  --vanilla | VANILLA"
 }
 
 func_get_commitid_by_msg() {
@@ -117,6 +118,10 @@ while [ "${#}" -gt 0 ]; do
             func_validate_parameter_value "${1}" "${2}"
             PARTITION="${2}"
             shift
+            shift
+            ;;
+        --vanilla )
+            VANILLA="true"
             shift
             ;;
         --help )
@@ -245,7 +250,11 @@ if [ "$PARTITION" == "recovery" ]; then
     git cherry-pick $(func_get_commitid_by_msg "$COMMITMSG_BLKROSET_PERMANENT")
 fi
 
-cat arch/arm64/configs/mi8937_defconfig arch/arm64/configs/.mi8937_defconfig_extra >> $OUT/.config
+if [ "$VANILLA" == "true" ]; then
+cp arch/arm64/configs/mi8937_defconfig $OUT/.config
+else
+cat arch/arm64/configs/mi8937_defconfig arch/arm64/configs/.mi8937_defconfig_extra > $OUT/.config
+fi
 
 source $OUT/.config
 if ! [ -z "$VARIANT_NAME" ]; then
@@ -255,6 +264,9 @@ echo >> $OUT/.config
 echo "# Appended by build script" >> $OUT/.config
 if [ "$LTO" == "true" ]; then
     func_set_defconfig $OUT/.config CONFIG_LTO_CLANG y
+fi
+if [ "$VANILLA" == "true" ]; then
+    func_set_defconfig $OUT/.config CONFIG_VIB_GPIO y
 fi
 source $OUT/.config
 
