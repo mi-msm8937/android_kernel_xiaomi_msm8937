@@ -7,6 +7,7 @@ cd $MY_PATH
 BRANCH_COMMITS="reference"
 BRANCH_MAIN="a12/master"
 BUILD_FLAGS="-j$(nproc) LLVM=1"
+COMMITMSG_BLKROSET_PERMANENT="block: Add new ioctl to set block device to ro permanently"
 COMMITMSG_LEGACY_OMX="This reverts commit e265d46203a6a01abb9824933dee5641f4aff428"
 COMMITMSG_OLD_VIB_DTS="ARM64: dts: Bring back old vibrator nodes"
 SUPPORTED_ANDROID_VERSIONS="8.1.0 - 12"
@@ -240,6 +241,8 @@ if [ "$PARTITION" == "recovery" ]; then
     sed -i 's|max_brightness = LED_FULL|max_brightness = 1|g' drivers/leds/leds-msm-back-gpio-flash-ulysse.c
     git add drivers/leds/leds-msm-back-gpio-flash-ulysse.c
     git commit -m "Workaround flashlight issue in recovery mode"
+
+    git cherry-pick $(func_get_commitid_by_msg "$COMMITMSG_BLKROSET_PERMANENT")
 fi
 
 cat arch/arm64/configs/mi8937_defconfig arch/arm64/configs/.mi8937_defconfig_extra >> $OUT/.config
