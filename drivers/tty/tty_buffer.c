@@ -552,7 +552,7 @@ void tty_flip_buffer_push(struct tty_port *port)
 	struct tty_bufhead *buf = &port->buf;
 
 	tty_flip_buffer_commit(buf->tail);
-	queue_kthread_work(&port->worker, &buf->work);
+	kthread_queue_work(&port->worker, &buf->work);
 }
 EXPORT_SYMBOL(tty_flip_buffer_push);
 
@@ -582,7 +582,7 @@ int tty_insert_flip_string_and_push_buffer(struct tty_port *port,
 		tty_flip_buffer_commit(buf->tail);
 	spin_unlock_irqrestore(&port->lock, flags);
 
-	queue_kthread_work(&port->worker, &buf->work);
+	kthread_queue_work(&port->worker, &buf->work);
 
 	return size;
 }
