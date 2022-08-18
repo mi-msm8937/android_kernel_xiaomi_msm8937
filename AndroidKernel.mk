@@ -1,5 +1,5 @@
 #Android makefile to build kernel as a part of Android Build
-PERL		= perl
+PERL		= $(shell which perl)
 
 # Set use the full path to the make command
 KERNEL_MAKE_CMD := prebuilts/build-tools/$(HOST_OS)-x86/bin/make
