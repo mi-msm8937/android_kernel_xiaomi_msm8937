@@ -61,7 +61,7 @@ ifeq ($(KERNEL_ARCH), arm64)
 	endif
 endif
 
-PATH_OVERRIDE :=
+PATH_OVERRIDE := $(TOOLS_PATH_OVERRIDE)
 ifeq ($(KERNEL_LLVM_SUPPORT), true)
   ifeq ($(KERNEL_SD_LLVM_SUPPORT), true)  #Using sd-llvm compiler
     ifeq ($(shell echo $(SDCLANG_PATH) | head -c 1),/)
@@ -74,7 +74,7 @@ ifeq ($(KERNEL_LLVM_SUPPORT), true)
      KERNEL_LLVM_BIN := $(shell pwd)/$(CLANG) #Using aosp-llvm compiler
     $(warning "Using aosp-llvm" $(KERNEL_LLVM_BIN))
   endif
-PATH_OVERRIDE := PATH=$(KERNEL_LLVM_BIN):$$PATH LD_LIBRARY_PATH=$(KERNEL_LLVM_BIN)/../lib64:$$LD_LIBRARY_PATH
+PATH_OVERRIDE += PATH=$(KERNEL_LLVM_BIN):$$PATH LD_LIBRARY_PATH=$(KERNEL_LLVM_BIN)/../lib64:$$LD_LIBRARY_PATH
 endif
 
 ifeq ($(TARGET_PREBUILT_KERNEL),)
