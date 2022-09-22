@@ -2308,7 +2308,7 @@ static void console_unregister(struct uart_driver *drv)
 }
 
 static struct console cons_ops = {
-	.name = "ttyMSM",
+	.name = "ttySMSM",
 	.write = msm_geni_serial_console_write,
 	.device = uart_console_device,
 	.setup = msm_geni_console_setup,
@@ -2320,7 +2320,7 @@ static struct console cons_ops = {
 static struct uart_driver msm_geni_console_driver = {
 	.owner = THIS_MODULE,
 	.driver_name = "msm_geni_console",
-	.dev_name = "ttyMSM",
+	.dev_name = "ttySMSM",
 	.nr =  GENI_UART_NR_PORTS,
 	.cons = &cons_ops,
 };
