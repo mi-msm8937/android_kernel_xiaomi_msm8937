@@ -1643,6 +1643,7 @@ static int z_erofs_vle_normalaccess_readpages(struct file *filp,
 
 	trace_erofs_readpages(mapping->host, lru_to_page(pages), nr_pages, false);
 
+#ifdef CONFIG_BLK_DEV_THROTTLING
 	if (pages) {
 		/*
 		 * Get one quota before read pages, when this ends,
@@ -1652,6 +1653,7 @@ static int z_erofs_vle_normalaccess_readpages(struct file *filp,
 		blk_throtl_get_quota(bdev, PAGE_SIZE,
 				     msecs_to_jiffies(100), true);
 	}
+#endif
 
 #if (EROFS_FS_ZIP_CACHE_LVL >= 2)
 	f.cachedzone_la = lru_to_page(pages)->index << PAGE_SHIFT;
@@ -1707,10 +1709,12 @@ static int z_erofs_vle_normalaccess_readpages(struct file *filp,
 	/* clean up the remaining free pages */
 	put_pages_list(&pagepool);
 
+#ifdef CONFIG_BLK_DEV_THROTTLING
 	if (io_submitted)
 		while (--io_submitted)
 			blk_throtl_get_quota(bdev, PAGE_SIZE,
 					     msecs_to_jiffies(100), true);
+#endif
 	return 0;
 }
 
