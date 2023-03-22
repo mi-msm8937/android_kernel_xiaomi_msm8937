@@ -5,7 +5,7 @@ MY_PATH=$(dirname $(realpath "$0"))
 cd $MY_PATH
 
 BRANCH_COMMITS="reference"
-BRANCH_MAIN="a12/master"
+BRANCH_MAIN="a13/master"
 BUILD_FLAGS="-j$(nproc) LLVM=1"
 COMMITMSG_BLKROSET_PERMANENT="block: Add new ioctl to set block device to ro permanently"
 COMMITMSG_LEGACY_OMX="This reverts commit e265d46203a6a01abb9824933dee5641f4aff428"
